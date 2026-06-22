@@ -1,105 +1,872 @@
-<script>
-    // กำหนด URL ของ Google Web App ที่คุณได้ Deploy ล่าสุด
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzKXIyaK8MEW1VPJaE0f6kOlvQL8KIU0788xwaGVuJLyP0hFLnaaydUFF9-bXChxJpM/exec";
+<!DOCTYPE html>
+<html lang="th" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แอปบันทึกและเบิกจ่ายเงิน (Cloud Sync)</title>
+  
+  <!-- นำเข้าทรัพยากรการแสดงผลที่จำเป็นเพื่อความเสถียรเมื่อรันบน GitHub -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Sarabun', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
 
-    // อัปเดตฟังก์ชันเชื่อมโยงดึงข้อมูลกับ GAS ด้วยวิธี Fetch API
-    function loadDataFromGAS() {
-      fetch(`${WEB_APP_URL}?action=getExpenses`)
-        .then(response => response.json())
-        .then(data => {
-          updateUI(data);
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes pulse-soft {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .animate-pulse-soft {
+      animation: pulse-soft 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-[#0D0F14] dark:text-gray-100 min-h-screen font-sans flex flex-col pb-12">
+
+  <!-- ส่วนหัวเว็บ (Header & Settings) -->
+  <header class="sticky top-0 z-30 bg-white/80 dark:bg-[#0D0F14]/80 backdrop-blur-md border-b border-slate-200/50 dark:border-gray-800/50 px-4 py-3 transition-colors">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white">
+          <i data-lucide="wallet" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-sm font-extrabold text-slate-800 dark:text-white leading-tight">ระบบเบิกจ่ายคลาวด์</h1>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span id="syncStatusBadge" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            <span id="syncStatusText" class="text-[10px] font-bold text-slate-500 dark:text-gray-400">โหมดทดลอง (Demo)</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <!-- ปุ่มเปิดลิ้นชักการตั้งค่าเชื่อมต่อ -->
+        <button onclick="toggleSettingsModal(true)" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all relative">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          <span id="settingsAlertDot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white dark:border-[#0D0F14]"></span>
+        </button>
+        <!-- ปุ่มเปิดปิดโหมดมืด -->
+        <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all">
+          <i id="themeIcon" data-lucide="sun" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- เนื้อหาหลักของแอปพลิเคชัน -->
+  <main class="flex-1 w-full max-w-md mx-auto px-4 mt-6">
+    
+    <!-- แดชบอร์ดสรุปยอดเงินแบบการ์ดแก้วพรีเมียม -->
+    <section class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden mb-6">
+      <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
+      <div class="absolute -left-10 -top-10 w-32 h-32 bg-teal-400/20 rounded-full blur-xl"></div>
+      
+      <p class="text-xs font-semibold uppercase tracking-wider text-emerald-100">รวมค่าใช้จ่ายทั้งหมดในระบบ</p>
+      <h2 id="totalBalanceText" class="text-3xl font-black mt-1">฿0.00</h2>
+      
+      <div class="grid grid-cols-2 gap-4 mt-6 pt-5 border-t border-white/10">
+        <div>
+          <p class="text-[10.5px] text-emerald-100 font-medium">บันทึกวันนี้</p>
+          <p id="todayTotalText" class="text-base font-extrabold mt-0.5">฿0.00</p>
+        </div>
+        <div>
+          <p class="text-[10.5px] text-emerald-100 font-medium">รวมรายการเบิกจ่าย</p>
+          <p id="totalCountText" class="text-base font-extrabold mt-0.5">0 รายการ</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- แท็บเมนูสลับหน้าจอการทำงาน -->
+    <div class="flex bg-slate-100 dark:bg-gray-800 p-1.5 rounded-2xl mb-6">
+      <button id="tab-add" onclick="switchTab('add')" class="flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm">
+        <i data-lucide="plus-circle" class="w-4 h-4"></i> บันทึกรายการ
+      </button>
+      <button id="tab-stats" onclick="switchTab('stats')" class="flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-500 dark:text-gray-400">
+        <i data-lucide="pie-chart" class="w-4 h-4"></i> แผนภูมิสรุป
+      </button>
+    </div>
+
+    <!-- ส่วนที่ 1: แท็บบันทึก / หน้าประวัติรายการ -->
+    <div id="content-add" class="space-y-6">
+      <!-- ฟอร์มกรอกบันทึกข้อมูลหลัก -->
+      <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm transition-colors">
+        <div class="flex items-center justify-between mb-4">
+          <h3 id="formTitle" class="text-sm font-extrabold flex items-center gap-2">
+            <span class="w-2 h-4 bg-emerald-500 rounded"></span> บันทึกรายการใหม่
+          </h3>
+          <button id="cancelEditBtn" onclick="cancelEditMode()" class="hidden text-xs font-bold text-rose-500 hover:underline">ยกเลิกแก้ไข</button>
+        </div>
+
+        <form id="expenseForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">วันที่บันทึก</label>
+              <input type="date" id="dateInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">หมวดหมู่</label>
+              <select id="categoryInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
+                <option value="อาหาร">🍱 อาหาร</option>
+                <option value="เดินทาง">🚗 เดินทาง</option>
+                <option value="ค่าบริการ">⚡ ค่าบริการ / บิล</option>
+                <option value="สันทนาการ">🍿 สันทนาการ</option>
+                <option value="สุขภาพ">🏥 สุขภาพ</option>
+                <option value="อื่นๆ">🪙 อื่นๆ</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">รายละเอียดรายการ</label>
+            <input type="text" id="descInput" required placeholder="เช่น ค่าอาหารกลางวัน, ค่าน้ำมันรถ" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs font-semibold outline-none focus:border-emerald-500 transition-all">
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">จำนวนเงิน (บาท)</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">฿</span>
+              <input type="number" id="amountInput" required step="0.01" min="0.1" placeholder="0.00" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl pl-8 pr-4 py-3 text-xs font-black outline-none focus:border-emerald-500 transition-all">
+            </div>
+          </div>
+
+          <button type="submit" id="submitBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-4 px-4 rounded-xl shadow-md shadow-emerald-500/10 flex items-center justify-center gap-2 hover:scale-[1.01] transition-all">
+            <i data-lucide="check" class="w-4 h-4"></i> บันทึกข้อมูล
+          </button>
+        </form>
+      </section>
+
+      <!-- ประวัติรายการบันทึกย้อนหลัง -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-extrabold flex items-center gap-2">
+            <span class="w-2 h-4 bg-teal-500 rounded"></span> ประวัติรายการล่าสุด
+          </h3>
+          <span id="localDataNotice" class="text-[10px] bg-slate-100 dark:bg-gray-800 px-2.5 py-1 rounded-full font-bold text-slate-500 dark:text-gray-400">
+            โหมดทดลอง
+          </span>
+        </div>
+
+        <!-- ตัวกรองการแสดงผลย้อนหลัง -->
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
+            <input type="text" id="searchInput" oninput="filterExpenses()" placeholder="ค้นหารายการ..." class="w-full bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none focus:border-emerald-500 transition-all">
+          </div>
+          <select id="filterCategory" onchange="filterExpenses()" class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl px-3 text-xs font-bold outline-none">
+            <option value="ทั้งหมด">ทุกหมวดหมู่</option>
+            <option value="อาหาร">🍱 อาหาร</option>
+            <option value="เดินทาง">🚗 เดินทาง</option>
+            <option value="ค่าบริการ">⚡ ค่าบริการ</option>
+            <option value="สันทนาการ">🍿 สันทนาการ</option>
+            <option value="สุขภาพ">🏥 สุขภาพ</option>
+            <option value="อื่นๆ">🪙 อื่นๆ</option>
+          </select>
+        </div>
+
+        <!-- โหลดเดอร์แอนิเมชันสำหรับบอกสถานะการเชื่อมต่อ -->
+        <div id="loadingIndicator" class="hidden bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800/50 p-8 rounded-3xl text-center space-y-3">
+          <div class="w-8 h-8 rounded-full border-3 border-emerald-500 border-t-transparent animate-spin mx-auto"></div>
+          <p class="text-xs text-slate-500 dark:text-gray-400 font-bold animate-pulse-soft">กำลังดึงฐานข้อมูลคลาวด์...</p>
+        </div>
+
+        <!-- โหนดแสดงรายการผลลัพธ์ -->
+        <div id="expensesContainer" class="space-y-2">
+          <!-- จะนำเข้าประวัติผ่านการ Render ฝั่ง JavaScript -->
+        </div>
+      </section>
+    </div>
+
+    <!-- ส่วนที่ 2: แท็บแผนภูมิสถิติรายจ่าย -->
+    <div id="content-stats" class="hidden space-y-6">
+      <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm">
+        <h3 class="text-sm font-extrabold flex items-center gap-2 mb-4">
+          <span class="w-2 h-4 bg-purple-500 rounded"></span> สัดส่วนรายจ่ายตามหมวดหมู่
+        </h3>
+
+        <!-- กราฟวงกลมจำลองด้วย SVG & conic-gradient -->
+        <div class="flex flex-col items-center justify-center py-6">
+          <div id="chartDonut" class="w-44 h-44 rounded-full shadow-inner relative flex items-center justify-center transition-all duration-500" style="background: conic-gradient(#e2e8f0 0% 100%)">
+            <div class="w-32 h-32 bg-white dark:bg-[#13151C] rounded-full flex flex-col items-center justify-center shadow-md">
+              <span class="text-[10px] font-bold text-slate-400 uppercase">สัดส่วนวันนี้</span>
+              <span id="chartCenterSum" class="text-base font-black text-slate-800 dark:text-white mt-0.5">฿0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- รายละเอียดสัญลักษณ์สีประจำกลุ่มกราฟ -->
+        <div id="chartLegendContainer" class="space-y-2 mt-4">
+          <!-- ข้อมูล Legend แสดงผลผ่าน JS -->
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- หน้าต่างแก้วป็อปอัปยืนยันการลบข้อมูล (Custom Modal) -->
+  <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs text-center space-y-4 shadow-xl">
+      <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/30 rounded-2xl flex items-center justify-center mx-auto text-rose-500">
+        <i data-lucide="trash-2" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h4 class="text-sm font-extrabold">ยืนยันการลบรายการเบิกจ่าย?</h4>
+        <p class="text-xs text-slate-500 dark:text-gray-400 mt-1">ข้อมูลที่ถูกลบออกจากคลาวด์ชีทแล้วจะไม่สามารถกู้คืนได้</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <button onclick="toggleDeleteModal(false)" class="bg-slate-100 dark:bg-gray-800 py-3 rounded-xl text-xs font-bold text-slate-500 dark:text-gray-400">ยกเลิก</button>
+        <button id="confirmDeleteBtn" class="bg-rose-500 text-white py-3 rounded-xl text-xs font-bold shadow-md shadow-rose-500/10">ลบข้อมูล</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- หน้าต่างลิ้นชักการตั้งค่าเชื่อมต่อคลาวด์ (Settings Drawer/Modal) -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl relative">
+      <div class="flex items-center justify-between">
+        <h4 class="text-sm font-extrabold flex items-center gap-2">
+          <i data-lucide="cloud-lightning" class="w-4 h-4 text-emerald-500"></i> ตั้งค่าการเชื่อมต่อ Google Sheets
+        </h4>
+        <button onclick="toggleSettingsModal(false)" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-400">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3.5">
+        <div class="bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 p-3 rounded-2xl text-[11px] leading-relaxed border border-amber-200/50 dark:border-amber-950/30">
+          💡 <strong>คำแนะนำ:</strong> นำลิงก์ Web App URL ที่คุณทำการ Deploy (ทำให้ใช้งานได้) จากฝั่ง Google Apps Script มาวางที่นี่เพื่อให้แอปสามารถจัดเก็บข้อมูลแบบถาวรบนคลาวด์ได้
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400">Google Apps Script Web App URL</label>
+          <input type="url" id="settingsUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3.5 text-xs outline-none focus:border-emerald-500 font-mono">
+        </div>
+
+        <div class="flex gap-2">
+          <button id="testConnectionBtn" onclick="testCloudConnection()" class="flex-1 bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 text-slate-700 dark:text-gray-300 font-bold text-xs py-3 rounded-xl transition-all">
+            ทดสอบเชื่อมต่อ
+          </button>
+          <button onclick="saveSettings()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md shadow-emerald-500/10">
+            บันทึกการเชื่อมต่อ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ระบบป็อปอัปแจ้งเตือนลอยพริ้วไหว (Floating Toasts Manager) -->
+  <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ----------------- ส่วนระบบควบคุมโปรแกรมหลักผ่านสคริปต์ JavaScript ----------------- -->
+  <script>
+    // ข้อมูลเริ่มต้นสำหรับรันเมื่อระบบเปิดทำงาน (โหมดสาธิตหากไม่มีคีย์คลาวด์)
+    const DEMO_KEY = "expense_tracker_demo_data";
+    const MOCK_EXPENSES = [
+      { id: "1", date: new Date().toISOString().split('T')[0], category: "อาหาร", description: "อาหารมื้อกลางวันยอดฮิต", amount: 120 },
+      { id: "2", date: new Date().toISOString().split('T')[0], category: "เดินทาง", description: "ค่าน้ำมันรถยนต์สำหรับการทำงาน", amount: 500 },
+      { id: "3", date: new Date().toISOString().split('T')[0], category: "ค่าบริการ", description: "บิลค่าน้ำและไฟฟ้าสำนักงาน", amount: 1450.50 }
+    ];
+
+    const CATEGORY_STYLES = {
+      "อาหาร": { emoji: "🍱", color: "from-amber-400 to-orange-500", hex: "#f59e0b" },
+      "เดินทาง": { emoji: "🚗", color: "from-blue-400 to-indigo-500", hex: "#3b82f6" },
+      "ค่าบริการ": { emoji: "⚡", color: "from-emerald-400 to-teal-500", hex: "#10b981" },
+      "สันทนาการ": { emoji: "🍿", color: "from-purple-400 to-pink-500", hex: "#a855f7" },
+      "สุขภาพ": { emoji: "🏥", color: "from-rose-400 to-red-500", hex: "#f43f5e" },
+      "อื่นๆ": { emoji: "🪙", color: "from-slate-400 to-gray-500", hex: "#64748b" }
+    };
+
+    let expenses = [];
+    let isCloudMode = false;
+    let webAppUrl = "";
+    let editingId = null;
+    let deleteIdTarget = null;
+
+    // ระบบทำงานเมื่อเริ่มต้น (DOMContentLoaded)
+    window.addEventListener('DOMContentLoaded', () => {
+      // ตรวจสอบธีม
+      initTheme();
+      // ดึง URL คลาวด์ที่เคยบันทึกไว้ในเบราว์เซอร์
+      const storedUrl = localStorage.getItem('gas_web_app_url');
+      if (storedUrl && storedUrl.trim().startsWith('https://script.google.com/')) {
+        webAppUrl = storedUrl.trim();
+        document.getElementById('settingsUrlInput').value = webAppUrl;
+        document.getElementById('settingsAlertDot').classList.add('hidden');
+        isCloudMode = true;
+        updateStatusBadge(true, "เชื่อมคลาวด์สด");
+        fetchExpensesFromCloud();
+      } else {
+        // หากไม่มีข้อมูล ให้เริ่มด้วยระบบสาธิตใน LocalStorage เพื่อให้หน้ารันแอปผ่านเสมอกัน
+        document.getElementById('settingsAlertDot').classList.remove('hidden');
+        isCloudMode = false;
+        updateStatusBadge(false, "โหมดจำลอง (Demo)");
+        loadLocalExpenses();
+      }
+      
+      // ตั้งค่าวินาทีปัจจุบันลงในฟิลด์ปฏิทิน
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('dateInput').value = today;
+      
+      lucide.createIcons();
+    });
+
+    // ตรวจสอบและตั้งธีม Dark/Light
+    function initTheme() {
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeIcon').setAttribute('data-lucide', 'moon');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('themeIcon').setAttribute('data-lucide', 'sun');
+      }
+      lucide.createIcons();
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      document.getElementById('themeIcon').setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+      lucide.createIcons();
+    }
+
+    // อัปเดตไอคอนเชื่อมต่อ
+    function updateStatusBadge(active, text) {
+      const badge = document.getElementById('syncStatusBadge');
+      const badgeText = document.getElementById('syncStatusText');
+      const notice = document.getElementById('localDataNotice');
+
+      if (active) {
+        badge.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+        badgeText.innerText = text;
+        notice.innerText = "คลาวด์ Google Sheet";
+        notice.className = "text-[10px] bg-emerald-100 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full font-bold text-emerald-600 dark:text-emerald-400";
+      } else {
+        badge.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+        badgeText.innerText = text;
+        notice.innerText = "โหมดทดลองเซฟในเครื่อง";
+        notice.className = "text-[10px] bg-amber-100 dark:bg-amber-950/40 px-2.5 py-1 rounded-full font-bold text-amber-600 dark:text-amber-400";
+      }
+    }
+
+    // จัดการลิ้นชักการตั้งค่าคลาวด์
+    function toggleSettingsModal(show) {
+      const modal = document.getElementById('settingsModal');
+      modal.style.display = show ? 'flex' : 'none';
+    }
+
+    // โหลดฐานข้อมูลจากคลาสเครื่องเมื่อไม่มีคลาวด์
+    function loadLocalExpenses() {
+      const localData = localStorage.getItem(DEMO_KEY);
+      if (localData) {
+        expenses = JSON.parse(localData);
+      } else {
+        expenses = [...MOCK_EXPENSES];
+        localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
+      }
+      renderDataAndStats();
+    }
+
+    // ดึงค่ารายการเบิกจ่ายจาก Cloud Google Web App
+    function fetchExpensesFromCloud() {
+      const container = document.getElementById('expensesContainer');
+      const loader = document.getElementById('loadingIndicator');
+      
+      container.classList.add('hidden');
+      loader.classList.remove('hidden');
+
+      // ตรวจสอบการยิง GET request ที่ปลอดภัยไร้ preflight
+      fetch(`${webAppUrl}?action=getExpenses`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("สถานะเซิร์ฟเวอร์คลาวด์แจ้งเตือนผิดปกติ");
+        return res.json();
+      })
+      .then(data => {
+        expenses = Array.isArray(data) ? data : [];
+        renderDataAndStats();
+        loader.classList.add('hidden');
+        container.classList.remove('hidden');
+        showToast("ซิงก์ข้อมูลกับชีทสำเร็จ", "cloud-lightning");
+      })
+      .catch(err => {
+        console.error(err);
+        loader.classList.add('hidden');
+        container.classList.remove('hidden');
+        showToast("เชื่อมคลาวด์ล้มเหลว สลับเป็นโหมดจำลองชั่วคราว", "alert-triangle");
+        isCloudMode = false;
+        updateStatusBadge(false, "เกิดข้อผิดพลาดในการดึงข้อมูล");
+        loadLocalExpenses();
+      });
+    }
+
+    // บันทึกที่อยู่เชื่อมต่อไปยังเซสชัน
+    function saveSettings() {
+      const inputVal = document.getElementById('settingsUrlInput').value.trim();
+      if (!inputVal) {
+        localStorage.removeItem('gas_web_app_url');
+        webAppUrl = "";
+        isCloudMode = false;
+        document.getElementById('settingsAlertDot').classList.remove('hidden');
+        updateStatusBadge(false, "โหมดจำลอง (Demo)");
+        toggleSettingsModal(false);
+        loadLocalExpenses();
+        showToast("รีเซ็ตสถานะเป็นโหมดทดลองในเครื่องแล้ว", "info");
+        return;
+      }
+
+      if (!inputVal.startsWith("https://script.google.com/")) {
+        showToast("ที่อยู่ลิงก์ Google Script ไม่ถูกต้อง!", "alert-circle");
+        return;
+      }
+
+      localStorage.setItem('gas_web_app_url', inputVal);
+      webAppUrl = inputVal;
+      isCloudMode = true;
+      document.getElementById('settingsAlertDot').classList.add('hidden');
+      updateStatusBadge(true, "เชื่อมคลาวด์สด");
+      toggleSettingsModal(false);
+      fetchExpensesFromCloud();
+    }
+
+    // ฟังก์ชันทดสอบการเชื่อมต่อ
+    function testCloudConnection() {
+      const inputVal = document.getElementById('settingsUrlInput').value.trim();
+      if (!inputVal) {
+        showToast("กรุณากรอก URL เว็บแอปเพื่อทดสอบ", "alert-circle");
+        return;
+      }
+
+      const btn = document.getElementById('testConnectionBtn');
+      const originalText = btn.innerText;
+      btn.innerText = "กำลังทดสอบ...";
+      btn.disabled = true;
+
+      fetch(inputVal, { method: 'GET', mode: 'cors' })
+        .then(res => res.json())
+        .then(resData => {
+          showToast("เชื่อมต่อฐานข้อมูลสำเร็จ!", "check-circle");
+          btn.innerText = originalText;
+          btn.disabled = false;
         })
-        .catch(error => {
-          const loadingDiv = document.getElementById('loadingIndicator');
-          loadingDiv.innerHTML = `
-            <i data-lucide="alert-circle" class="w-8 h-8 text-red-500 mx-auto mb-2 animate-bounce"></i>
-            <p class="text-xs text-red-400 font-bold">เชื่อมต่อสารสนเทศบนคลาวด์ไม่สำเร็จ</p>
-            <p class="text-[10px] text-gray-500 mt-1">${error.message}</p>
-          `;
-          lucide.createIcons();
-          console.error("Error loading data:", error);
+        .catch(err => {
+          showToast("เชื่อมล้มเหลว เช็กสิทธิ์ Everyone ในการ Deploy", "x-circle");
+          btn.innerText = originalText;
+          btn.disabled = false;
         });
     }
 
-    // ฟังก์ชันรันการลบข้อมูลผ่านการยิง Fetch POST
-    function executeDelete() {
-      if (!deleteTargetId) return;
-      
-      document.getElementById('confirmDeleteModal').classList.add('hidden');
-      document.getElementById('loadingIndicator').classList.remove('hidden');
-      document.getElementById('historySection').classList.add('hidden');
-      
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        mode: "no-cors", // ใช้ no-cors เนื่องจากเป็นข้อจำกัดการยิง Redirect ข้ามโดเมนของ Google
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({ action: 'deleteExpense', data: { id: deleteTargetId } })
-      })
-      .then(() => {
-        // เนื่องจากโหมด no-cors จะอ่าน Response ตรงๆ ไม่ได้ ให้ตั้งเวลาหน่วงไว้ดึงข้อมูลชุดใหม่เข้าทดแทน
-        setTimeout(() => {
-          loadDataFromGAS();
-          showToast('ส่งคำขอลบข้อมูลไปยังคลาวด์เรียบร้อยแล้ว', 'trash-2');
-        }, 1500);
-      })
-      .catch(error => {
-        showToast('เกิดข้อผิดพลาดในการส่งข้อมูล: ' + error.message, 'alert-circle');
-        loadDataFromGAS();
-      });
-      
-      deleteTargetId = null;
+    // บดบังข้อมูลแสดงผลและสถิติ
+    function renderDataAndStats() {
+      renderExpenses(expenses);
+      updateSummaryCards(expenses);
+      renderCategoryChart(expenses);
     }
 
-    // ฟังก์ชันจัดการส่งฟอร์มข้อมูลเพิ่มและแก้ไขผ่านการยิง Fetch POST
-    function handleFormSubmit(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '<div class="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin border-white"></div> กำลังเชื่อมต่อ...';
-      btn.disabled = true;
+    // วาดไอเทมประวัติเบิกจ่ายทั้งหมดลงหน้าจอ
+    function renderExpenses(items) {
+      const container = document.getElementById('expensesContainer');
+      container.innerHTML = "";
 
-      const data = {
-        date: document.getElementById('dateInput').value,
-        category: document.getElementById('categoryInput').value,
-        description: document.getElementById('descInput').value,
-        amount: document.getElementById('amountInput').value
-      };
-
-      let actionType = 'addExpense';
-      if (editingId) {
-        data.id = editingId;
-        actionType = 'updateExpense';
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white dark:bg-[#13151C] border border-slate-200/50 dark:border-gray-800/40 p-10 rounded-3xl text-center space-y-2">
+            <div class="text-3xl">📭</div>
+            <p class="text-xs text-slate-500 font-bold dark:text-gray-400">ยังไม่มีประวัติรายการเบิกจ่าย</p>
+          </div>
+        `;
+        return;
       }
 
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({ action: actionType, data: data })
-      })
-      .then(() => {
-        setTimeout(() => {
-          loadDataFromGAS();
-          if (editingId) {
-            cancelEdit();
-            showToast('อัปเดตการบันทึกสำเร็จ', 'check-circle');
-          } else {
-            document.getElementById('descInput').value = '';
-            document.getElementById('amountInput').value = '';
-            showToast('บันทึกลงคลาวด์เรียบร้อย', 'check-circle');
-          }
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-        }, 1500);
-      })
-      .catch(err => {
-        showToast('การส่งข้อมูลล้มเหลว: ' + err.message, 'alert-circle');
-        btn.disabled = false;
-        btn.innerHTML = originalText;
+      items.forEach(item => {
+        const cat = CATEGORY_STYLES[item.category] || CATEGORY_STYLES["อื่นๆ"];
+        
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-[#13151C] border border-slate-200/40 dark:border-gray-800/30 p-4 rounded-2xl flex items-center justify-between hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all shadow-sm group";
+        
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-slate-50 dark:bg-gray-800 rounded-xl flex items-center justify-center text-lg shadow-sm">
+              ${cat.emoji}
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-800 dark:text-white leading-snug">${item.description}</p>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-[9.5px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-wide">${item.category}</span>
+                <span class="text-[9.5px] text-slate-300 dark:text-gray-700">•</span>
+                <span class="text-[9.5px] font-semibold text-slate-400 dark:text-gray-500">${formatDateThai(item.date)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-black text-slate-800 dark:text-white">฿${parseFloat(item.amount).toLocaleString('th-TH', {minimumFractionDigits: 2})}</span>
+            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <button onclick="startEditMode('${item.id}', '${item.date}', '${item.category}', '${item.description}', ${item.amount})" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 text-blue-500">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="triggerDelete('${item.id}')" class="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-500">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
       });
+      lucide.createIcons();
     }
 
-    // [หมายเหตุ] สำหรับฟังก์ชันอื่นๆ ทั้งหมดในไฟล์เดิมของคุณ เช่น syncSystemTheme(),
-    // renderCategoryDropdowns(), renderChart(), switchTab() และระบบการคำนวณกราฟ
-    // สามารถคงรักษาชุดคำสั่งเดิมไว้ได้โดยไม่ต้องแก้ไขอะไรเลยครับ 
+    // ค้นหาและคัดกรองข้อมูลประวัติเบิกจ่าย
+    function filterExpenses() {
+      const search = document.getElementById('searchInput').value.trim().toLowerCase();
+      const catFilter = document.getElementById('filterCategory').value;
+
+      let filtered = expenses.filter(item => {
+        const matchesSearch = item.description.toLowerCase().includes(search) || item.category.toLowerCase().includes(search);
+        const matchesCat = (catFilter === "ทั้งหมด") || (item.category === catFilter);
+        return matchesSearch && matchesCat;
+      });
+
+      renderExpenses(filtered);
+    }
+
+    // คำนวณสรุปค่าใช้จ่ายยอดรวมทางการเงิน
+    function updateSummaryCards(items) {
+      const total = items.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+      document.getElementById('totalBalanceText').innerText = `฿${total.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todayTotal = items
+        .filter(item => item.date === todayStr)
+        .reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+
+      document.getElementById('todayTotalText').innerText = `฿${todayTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
+      document.getElementById('totalCountText').innerText = `${items.length} รายการ`;
+    }
+
+    // วาดกราฟวงกลมและ Legend ของสรุปสถิติตามแบบที่ผู้ใช้ต้องการ (กลับความกว้างตารางในรูปแบบ Pivot)
+    function renderCategoryChart(items) {
+      const donut = document.getElementById('chartDonut');
+      const legendContainer = document.getElementById('chartLegendContainer');
+      const chartCenterSum = document.getElementById('chartCenterSum');
+
+      if (items.length === 0) {
+        donut.style.background = "conic-gradient(#e2e8f0 0% 100%)";
+        legendContainer.innerHTML = `<p class="text-center text-xs text-slate-400 py-6 font-bold">ไม่มีข้อมูลสถิติ</p>`;
+        chartCenterSum.innerText = "฿0.00";
+        return;
+      }
+
+      // คำนวณรายจ่ายแต่ละกลุ่ม
+      const sums = {};
+      let grandTotal = 0;
+      items.forEach(item => {
+        const amount = parseFloat(item.amount || 0);
+        sums[item.category] = (sums[item.category] || 0) + amount;
+        grandTotal += amount;
+      });
+
+      chartCenterSum.innerText = `฿${grandTotal.toLocaleString('th-TH', {maximumFractionDigits: 0})}`;
+
+      // ประมวลสัดส่วนองศาของ conic-gradient
+      let accumulatedPercent = 0;
+      let conicSlices = [];
+
+      // แสดงตารางข้อมูลเบิกจ่ายแบบสลับแถวคอลัมน์ (ตามความชอบส่วนตัวของประวัติผู้ใช้งานคัดสเปกแบบ Swap Columns and Rows)
+      let tableRows = `
+        <table class="w-full text-xs text-left text-slate-500 dark:text-gray-400 border-collapse mt-2">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-gray-800/40 text-slate-700 dark:text-gray-300">
+              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold">ข้อมูลสรุปย่อ</th>
+              ${Object.keys(sums).map(cat => `<th class="p-2 border border-slate-200 dark:border-gray-800 font-extrabold text-center">${CATEGORY_STYLES[cat]?.emoji || '🪙'} ${cat}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white">รวมรายจ่าย</td>
+              ${Object.keys(sums).map(cat => `<td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center text-slate-900 dark:text-white">฿${sums[cat].toLocaleString('th-TH', {minimumFractionDigits: 1})}</td>`).join('')}
+            </tr>
+            <tr>
+              <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white">ร้อยละ (%)</td>
+              ${Object.keys(sums).map(cat => `<td class="p-2 border border-slate-200 dark:border-gray-800 text-center font-bold text-emerald-600 dark:text-emerald-400">${((sums[cat]/grandTotal)*100).toFixed(1)}%</td>`).join('')}
+            </tr>
+          </tbody>
+        </table>
+      `;
+
+      Object.entries(sums).forEach(([cat, amount]) => {
+        const style = CATEGORY_STYLES[cat] || CATEGORY_STYLES["อื่นๆ"];
+        const percentage = (amount / grandTotal) * 100;
+        const startDeg = accumulatedPercent;
+        accumulatedPercent += percentage;
+
+        conicSlices.push(`${style.hex} ${startDeg}% ${accumulatedPercent}%`);
+      });
+
+      donut.style.background = `conic-gradient(${conicSlices.join(', ')})`;
+
+      legendContainer.innerHTML = `
+        <div class="space-y-4">
+          <div class="overflow-x-auto scrollbar-hide border border-slate-200 dark:border-gray-800 rounded-2xl p-2 bg-white dark:bg-[#1A1C24]">
+            ${tableRows}
+          </div>
+          <p class="text-[10px] text-slate-400 dark:text-gray-500 font-semibold text-center italic">* ตารางสรุปแบบผันแปรแนวนอน (Column/Row Switched)</p>
+        </div>
+      `;
+    }
+
+    // รับมือระบบฟอร์ม เพิ่ม / แก้ไขรายการ
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const date = document.getElementById('dateInput').value;
+      const category = document.getElementById('categoryInput').value;
+      const description = document.getElementById('descInput').value.trim();
+      const amount = parseFloat(document.getElementById('amountInput').value);
+
+      if (!date || !category || !description || isNaN(amount)) {
+        showToast("กรอกรายละเอียดไม่สมบูรณ์", "alert-circle");
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitBtn');
+      const originalHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></span> กำลังบันทึกข้อมูล...`;
+
+      const expenseData = { date, category, description, amount };
+
+      if (isCloudMode) {
+        // จัดส่งข้อมูลคลาวด์โดยการแปลงเนื้อหาเป็น text/plain เลี่ยงปัญหายกเว้นสิทธิ์ CORS Preflight OPTIONS
+        let actionType = editingId ? 'updateExpense' : 'addExpense';
+        if (editingId) expenseData.id = editingId;
+
+        fetch(webAppUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify({ action: actionType, data: expenseData })
+        })
+        .then(res => {
+          if (!res.ok) throw new Error("การยิงข้อมูลเซสชันหลักไม่ผ่าน");
+          return res.json();
+        })
+        .then(resData => {
+          if (resData.status === "error") throw new Error(resData.message);
+          
+          // รอรับข้อมูลล่าสุดจากการอัปเดตแผ่นงาน
+          setTimeout(() => {
+            fetchExpensesFromCloud();
+            resetForm();
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHtml;
+            showToast(editingId ? "อัปเดตข้อมูลบนคลาวด์แล้ว!" : "เพิ่มรายการลงชีทแล้ว!", "check-circle");
+            editingId = null;
+          }, 1000);
+        })
+        .catch(err => {
+          console.error(err);
+          showToast("การเชื่อมล้มเหลว: " + err.message, "alert-circle");
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalHtml;
+        });
+
+      } else {
+        // ประมวลผลบนเครื่องคอมพิวเตอร์เมื่ออยู่ในโหมดทดลอง
+        if (editingId) {
+          expenses = expenses.map(item => item.id === editingId ? { ...item, ...expenseData } : item);
+          showToast("อัปเดตข้อมูลจำลองแล้ว", "check-circle");
+        } else {
+          const newId = new Date().getTime().toString();
+          expenses.unshift({ id: newId, ...expenseData });
+          showToast("เพิ่มข้อมูลโหมดจำลองแล้ว", "check-circle");
+        }
+        
+        localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
+        renderDataAndStats();
+        resetForm();
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHtml;
+        editingId = null;
+      }
+    }
+
+    // เริ่มต้นกระบวนการแก้ไขข้อมูล
+    function startEditMode(id, date, category, description, amount) {
+      editingId = id;
+      document.getElementById('dateInput').value = date;
+      document.getElementById('categoryInput').value = category;
+      document.getElementById('descInput').value = description;
+      document.getElementById('amountInput').value = amount;
+
+      document.getElementById('formTitle').innerHTML = `<span class="w-2 h-4 bg-blue-500 rounded"></span> แก้ไขรายการคลาวด์`;
+      document.getElementById('submitBtn').className = "w-full bg-blue-500 hover:bg-blue-600 text-white font-black text-xs py-4 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] transition-all";
+      document.getElementById('submitBtn').innerHTML = `<i data-lucide="edit-2" class="w-4 h-4"></i> อัปเดตข้อมูลรายการ`;
+      document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+      window.scrollTo({ top: 120, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    // ยกเลิกสถานะแก้ไข
+    function cancelEditMode() {
+      resetForm();
+      editingId = null;
+      showToast("ยกเลิกสถานะการแก้ไขแล้ว", "info");
+    }
+
+    function resetForm() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('dateInput').value = today;
+      document.getElementById('categoryInput').value = "อาหาร";
+      document.getElementById('descInput').value = "";
+      document.getElementById('amountInput').value = "";
+
+      document.getElementById('formTitle').innerHTML = `<span class="w-2 h-4 bg-emerald-500 rounded"></span> บันทึกรายการใหม่`;
+      document.getElementById('submitBtn').className = "w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-4 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] transition-all";
+      document.getElementById('submitBtn').innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> บันทึกข้อมูล`;
+      document.getElementById('cancelEditBtn').classList.add('hidden');
+      lucide.createIcons();
+    }
+
+    // เตรียมพร้อมลบข้อมูล
+    function triggerDelete(id) {
+      deleteIdTarget = id;
+      toggleDeleteModal(true);
+    }
+
+    function toggleDeleteModal(show) {
+      const modal = document.getElementById('deleteModal');
+      modal.style.display = show ? 'flex' : 'none';
+      
+      if (show) {
+        document.getElementById('confirmDeleteBtn').onclick = executeDelete;
+      }
+    }
+
+    // ลบข้อมูลจริงออกจากเซสชัน
+    function executeDelete() {
+      if (!deleteIdTarget) return;
+
+      toggleDeleteModal(false);
+      showToast("กำลังดำเนินคำขอลบ...", "loader");
+
+      if (isCloudMode) {
+        fetch(webAppUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify({ action: 'deleteExpense', data: { id: deleteIdTarget } })
+        })
+        .then(res => res.json())
+        .then(resData => {
+          if (resData.status === "error") throw new Error(resData.message);
+          setTimeout(() => {
+            fetchExpensesFromCloud();
+            showToast("ลบข้อมูลออกจาก Google Sheets แล้ว!", "trash-2");
+          }, 1000);
+        })
+        .catch(err => {
+          showToast("ลบข้อมูลไม่สำเร็จ: " + err.message, "alert-circle");
+        });
+      } else {
+        expenses = expenses.filter(item => item.id !== deleteIdTarget);
+        localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
+        renderDataAndStats();
+        showToast("ลบรายการจากเบราว์เซอร์แล้ว", "trash-2");
+      }
+
+      deleteIdTarget = null;
+    }
+
+    // นำเข้าตัวแจ้งเตือนความคืบหน้าลอยฟ้า
+    function showToast(message, iconName = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      toast.className = "bg-slate-900/90 dark:bg-white text-white dark:text-slate-900 px-4 py-3 rounded-2xl flex items-center gap-2.5 shadow-lg backdrop-blur-md text-xs font-bold transition-all duration-300 opacity-0 translate-y-2";
+      toast.innerHTML = `
+        <i data-lucide="${iconName}" class="w-4 h-4 shrink-0 text-emerald-400 dark:text-emerald-500"></i>
+        <span>${message}</span>
+      `;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      // แอนิเมชันตอนแสดงผล
+      setTimeout(() => {
+        toast.classList.remove('opacity-0', 'translate-y-2');
+      }, 50);
+
+      // เคลียร์ผลหลังจากพ้นระยะเวลาที่กำหนด
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-[-10px]');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ฟังก์ชันช่วยสลับการจัดการแท็บหน้าเมนูหลัก
+    function switchTab(tab) {
+      const tabAdd = document.getElementById('tab-add');
+      const tabStats = document.getElementById('tab-stats');
+      const contentAdd = document.getElementById('content-add');
+      const contentStats = document.getElementById('content-stats');
+
+      if (tab === 'add') {
+        tabAdd.className = "flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm";
+        tabStats.className = "flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-500 dark:text-gray-400";
+        contentAdd.classList.remove('hidden');
+        contentStats.classList.add('hidden');
+      } else {
+        tabStats.className = "flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm";
+        tabAdd.className = "flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-500 dark:text-gray-400";
+        contentAdd.classList.add('hidden');
+        contentStats.classList.remove('hidden');
+      }
+    }
+
+    // ฟังก์ชันฟอร์แมตจัดเรียงแปลงวันที่แบบไทยยอดนิยม
+    function formatDateThai(dateStr) {
+      if (!dateStr) return "";
+      const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      const p = dateStr.split('-');
+      if (p.length !== 3) return dateStr;
+      
+      const day = parseInt(p[2]);
+      const month = months[parseInt(p[1]) - 1];
+      const year = parseInt(p[0]) + 543; // แปลงพุทธศักราช
+      return `${day} ${month} ${year}`;
+    }
   </script>
+</body>
+</html>
