@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>แอปบันทึกและเบิกจ่ายเงิน (Cloud Sync)</title>
   
-  <!-- นำเข้าทรัพยากรการแสดงผลที่จำเป็นเพื่อความเสถียรเมื่อรันบน GitHub -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -46,7 +45,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-[#0D0F14] dark:text-gray-100 min-h-screen font-sans flex flex-col pb-12">
 
-  <!-- ส่วนหัวเว็บ (Header & Settings) -->
   <header class="sticky top-0 z-30 bg-white/80 dark:bg-[#0D0F14]/80 backdrop-blur-md border-b border-slate-200/50 dark:border-gray-800/50 px-4 py-3 transition-colors">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2">
@@ -57,18 +55,16 @@
           <h1 class="text-sm font-extrabold text-slate-800 dark:text-white leading-tight">ระบบเบิกจ่ายคลาวด์</h1>
           <div class="flex items-center gap-1.5 mt-0.5">
             <span id="syncStatusBadge" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-            <span id="syncStatusText" class="text-[10px] font-bold text-slate-500 dark:text-gray-400">โหมดทดลอง (Demo)</span>
+            <span id="syncStatusText" class="text-[10px] font-bold text-slate-500 dark:text-gray-400">กำลังตรวจสอบสถานะ...</span>
           </div>
         </div>
       </div>
       
       <div class="flex items-center gap-2">
-        <!-- ปุ่มเปิดลิ้นชักการตั้งค่าเชื่อมต่อ -->
         <button onclick="toggleSettingsModal(true)" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all relative">
           <i data-lucide="settings" class="w-4 h-4"></i>
           <span id="settingsAlertDot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white dark:border-[#0D0F14]"></span>
         </button>
-        <!-- ปุ่มเปิดปิดโหมดมืด -->
         <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all">
           <i id="themeIcon" data-lucide="sun" class="w-4 h-4"></i>
         </button>
@@ -76,10 +72,8 @@
     </div>
   </header>
 
-  <!-- เนื้อหาหลักของแอปพลิเคชัน -->
   <main class="flex-1 w-full max-w-md mx-auto px-4 mt-6">
     
-    <!-- แดชบอร์ดสรุปยอดเงินแบบการ์ดแก้วพรีเมียม -->
     <section class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden mb-6">
       <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
       <div class="absolute -left-10 -top-10 w-32 h-32 bg-teal-400/20 rounded-full blur-xl"></div>
@@ -99,7 +93,6 @@
       </div>
     </section>
 
-    <!-- แท็บเมนูสลับหน้าจอการทำงาน -->
     <div class="flex bg-slate-100 dark:bg-gray-800 p-1.5 rounded-2xl mb-6">
       <button id="tab-add" onclick="switchTab('add')" class="flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm">
         <i data-lucide="plus-circle" class="w-4 h-4"></i> บันทึกรายการ
@@ -109,9 +102,7 @@
       </button>
     </div>
 
-    <!-- ส่วนที่ 1: แท็บบันทึก / หน้าประวัติรายการ -->
     <div id="content-add" class="space-y-6">
-      <!-- ฟอร์มกรอกบันทึกข้อมูลหลัก -->
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm transition-colors">
         <div class="flex items-center justify-between mb-4">
           <h3 id="formTitle" class="text-sm font-extrabold flex items-center gap-2">
@@ -158,18 +149,16 @@
         </form>
       </section>
 
-      <!-- ประวัติรายการบันทึกย้อนหลัง -->
       <section class="space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-extrabold flex items-center gap-2">
             <span class="w-2 h-4 bg-teal-500 rounded"></span> ประวัติรายการล่าสุด
           </h3>
           <span id="localDataNotice" class="text-[10px] bg-slate-100 dark:bg-gray-800 px-2.5 py-1 rounded-full font-bold text-slate-500 dark:text-gray-400">
-            โหมดทดลอง
+            กำลังโหลดข้อมูล...
           </span>
         </div>
 
-        <!-- ตัวกรองการแสดงผลย้อนหลัง -->
         <div class="flex gap-2">
           <div class="relative flex-1">
             <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
@@ -186,27 +175,22 @@
           </select>
         </div>
 
-        <!-- โหลดเดอร์แอนิเมชันสำหรับบอกสถานะการเชื่อมต่อ -->
         <div id="loadingIndicator" class="hidden bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800/50 p-8 rounded-3xl text-center space-y-3">
           <div class="w-8 h-8 rounded-full border-3 border-emerald-500 border-t-transparent animate-spin mx-auto"></div>
           <p class="text-xs text-slate-500 dark:text-gray-400 font-bold animate-pulse-soft">กำลังดึงฐานข้อมูลคลาวด์...</p>
         </div>
 
-        <!-- โหนดแสดงรายการผลลัพธ์ -->
         <div id="expensesContainer" class="space-y-2">
-          <!-- จะนำเข้าประวัติผ่านการ Render ฝั่ง JavaScript -->
-        </div>
+          </div>
       </section>
     </div>
 
-    <!-- ส่วนที่ 2: แท็บแผนภูมิสถิติรายจ่าย -->
     <div id="content-stats" class="hidden space-y-6">
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm">
         <h3 class="text-sm font-extrabold flex items-center gap-2 mb-4">
           <span class="w-2 h-4 bg-purple-500 rounded"></span> สัดส่วนรายจ่ายตามหมวดหมู่
         </h3>
 
-        <!-- กราฟวงกลมจำลองด้วย SVG & conic-gradient -->
         <div class="flex flex-col items-center justify-center py-6">
           <div id="chartDonut" class="w-44 h-44 rounded-full shadow-inner relative flex items-center justify-center transition-all duration-500" style="background: conic-gradient(#e2e8f0 0% 100%)">
             <div class="w-32 h-32 bg-white dark:bg-[#13151C] rounded-full flex flex-col items-center justify-center shadow-md">
@@ -216,16 +200,13 @@
           </div>
         </div>
 
-        <!-- รายละเอียดสัญลักษณ์สีประจำกลุ่มกราฟ -->
         <div id="chartLegendContainer" class="space-y-2 mt-4">
-          <!-- ข้อมูล Legend แสดงผลผ่าน JS -->
-        </div>
+          </div>
       </section>
     </div>
 
   </main>
 
-  <!-- หน้าต่างแก้วป็อปอัปยืนยันการลบข้อมูล (Custom Modal) -->
   <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs text-center space-y-4 shadow-xl">
       <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/30 rounded-2xl flex items-center justify-center mx-auto text-rose-500">
@@ -242,7 +223,6 @@
     </div>
   </div>
 
-  <!-- หน้าต่างลิ้นชักการตั้งค่าเชื่อมต่อคลาวด์ (Settings Drawer/Modal) -->
   <div id="settingsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl relative">
       <div class="flex items-center justify-between">
@@ -276,10 +256,8 @@
     </div>
   </div>
 
-  <!-- ระบบป็อปอัปแจ้งเตือนลอยพริ้วไหว (Floating Toasts Manager) -->
   <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- ----------------- ส่วนระบบควบคุมโปรแกรมหลักผ่านสคริปต์ JavaScript ----------------- -->
   <script>
     // ข้อมูลเริ่มต้นสำหรับรันเมื่อระบบเปิดทำงาน (โหมดสาธิตหากไม่มีคีย์คลาวด์)
     const DEMO_KEY = "expense_tracker_demo_data";
@@ -299,8 +277,8 @@
     };
 
     let expenses = [];
-    let isCloudMode = false;
-    let webAppUrl = "";
+    let isCloudMode = true; // เปิดใช้งานโหมดคลาวด์เป็นค่าเริ่มต้น
+    let webAppUrl = "https://script.google.com/macros/s/AKfycbzKE9LqG62g4xQeGbOi6ZfKvx5gAtCjzZFYlauCHQe_10iBded4yTnEiS7Bz688NEpb/exec"; // ฝั่ง URL ของคุณโดยตรง
     let editingId = null;
     let deleteIdTarget = null;
 
@@ -308,22 +286,13 @@
     window.addEventListener('DOMContentLoaded', () => {
       // ตรวจสอบธีม
       initTheme();
-      // ดึง URL คลาวด์ที่เคยบันทึกไว้ในเบราว์เซอร์
-      const storedUrl = localStorage.getItem('gas_web_app_url');
-      if (storedUrl && storedUrl.trim().startsWith('https://script.google.com/')) {
-        webAppUrl = storedUrl.trim();
-        document.getElementById('settingsUrlInput').value = webAppUrl;
-        document.getElementById('settingsAlertDot').classList.add('hidden');
-        isCloudMode = true;
-        updateStatusBadge(true, "เชื่อมคลาวด์สด");
-        fetchExpensesFromCloud();
-      } else {
-        // หากไม่มีข้อมูล ให้เริ่มด้วยระบบสาธิตใน LocalStorage เพื่อให้หน้ารันแอปผ่านเสมอกัน
-        document.getElementById('settingsAlertDot').classList.remove('hidden');
-        isCloudMode = false;
-        updateStatusBadge(false, "โหมดจำลอง (Demo)");
-        loadLocalExpenses();
-      }
+      
+      // ตั้งค่า URL เริ่มต้นลงใน input field ของเมนูตั้งค่า
+      document.getElementById('settingsUrlInput').value = webAppUrl;
+      document.getElementById('settingsAlertDot').classList.add('hidden');
+      
+      updateStatusBadge(true, "เชื่อมคลาวด์สด");
+      fetchExpensesFromCloud();
       
       // ตั้งค่าวินาทีปัจจุบันลงในฟิลด์ปฏิทิน
       const today = new Date().toISOString().split('T')[0];
@@ -430,7 +399,6 @@
     function saveSettings() {
       const inputVal = document.getElementById('settingsUrlInput').value.trim();
       if (!inputVal) {
-        localStorage.removeItem('gas_web_app_url');
         webAppUrl = "";
         isCloudMode = false;
         document.getElementById('settingsAlertDot').classList.remove('hidden');
@@ -446,7 +414,6 @@
         return;
       }
 
-      localStorage.setItem('gas_web_app_url', inputVal);
       webAppUrl = inputVal;
       isCloudMode = true;
       document.getElementById('settingsAlertDot').classList.add('hidden');
@@ -570,7 +537,7 @@
       document.getElementById('totalCountText').innerText = `${items.length} รายการ`;
     }
 
-    // วาดกราฟวงกลมและ Legend ของสรุปสถิติตามแบบที่ผู้ใช้ต้องการ (กลับความกว้างตารางในรูปแบบ Pivot)
+    // วาดกราฟวงกลมและตารางสรุปสถิติแบบ Swap แถว/คอลัมน์ (Pivot Style)
     function renderCategoryChart(items) {
       const donut = document.getElementById('chartDonut');
       const legendContainer = document.getElementById('chartLegendContainer');
@@ -598,24 +565,35 @@
       let accumulatedPercent = 0;
       let conicSlices = [];
 
-      // แสดงตารางข้อมูลเบิกจ่ายแบบสลับแถวคอลัมน์ (ตามความชอบส่วนตัวของประวัติผู้ใช้งานคัดสเปกแบบ Swap Columns and Rows)
+      // สร้างตารางข้อมูลสรุปย่อแบบแถวและคอลัมน์สลับด้านกันตามเงื่อนไขพิเศษ
+      const categories = Object.keys(sums);
       let tableRows = `
         <table class="w-full text-xs text-left text-slate-500 dark:text-gray-400 border-collapse mt-2">
           <thead>
             <tr class="bg-slate-50 dark:bg-gray-800/40 text-slate-700 dark:text-gray-300">
-              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold">ข้อมูลสรุปย่อ</th>
-              ${Object.keys(sums).map(cat => `<th class="p-2 border border-slate-200 dark:border-gray-800 font-extrabold text-center">${CATEGORY_STYLES[cat]?.emoji || '🪙'} ${cat}</th>`).join('')}
+              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold">หมวดหมู่</th>
+              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center">รวมรายจ่าย</th>
+              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center">ร้อยละ (%)</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white">รวมรายจ่าย</td>
-              ${Object.keys(sums).map(cat => `<td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center text-slate-900 dark:text-white">฿${sums[cat].toLocaleString('th-TH', {minimumFractionDigits: 1})}</td>`).join('')}
-            </tr>
-            <tr>
-              <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white">ร้อยละ (%)</td>
-              ${Object.keys(sums).map(cat => `<td class="p-2 border border-slate-200 dark:border-gray-800 text-center font-bold text-emerald-600 dark:text-emerald-400">${((sums[cat]/grandTotal)*100).toFixed(1)}%</td>`).join('')}
-            </tr>
+            ${categories.map(cat => {
+              const amount = sums[cat];
+              const pct = ((amount / grandTotal) * 100).toFixed(1);
+              return `
+                <tr>
+                  <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white">
+                    ${CATEGORY_STYLES[cat]?.emoji || '🪙'} ${cat}
+                  </td>
+                  <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center text-slate-900 dark:text-white">
+                    ฿${amount.toLocaleString('th-TH', {minimumFractionDigits: 1})}
+                  </td>
+                  <td class="p-2 border border-slate-200 dark:border-gray-800 text-center font-bold text-emerald-600 dark:text-emerald-400">
+                    ${pct}%
+                  </td>
+                </tr>
+              `;
+            }).join('')}
           </tbody>
         </table>
       `;
@@ -636,7 +614,7 @@
           <div class="overflow-x-auto scrollbar-hide border border-slate-200 dark:border-gray-800 rounded-2xl p-2 bg-white dark:bg-[#1A1C24]">
             ${tableRows}
           </div>
-          <p class="text-[10px] text-slate-400 dark:text-gray-500 font-semibold text-center italic">* ตารางสรุปแบบผันแปรแนวนอน (Column/Row Switched)</p>
+          <p class="text-[10px] text-slate-400 dark:text-gray-500 font-semibold text-center italic">* ตารางแสดงผลสรุปแบบสลับแนวระนาบแนวตั้ง</p>
         </div>
       `;
     }
@@ -663,7 +641,6 @@
       const expenseData = { date, category, description, amount };
 
       if (isCloudMode) {
-        // จัดส่งข้อมูลคลาวด์โดยการแปลงเนื้อหาเป็น text/plain เลี่ยงปัญหายกเว้นสิทธิ์ CORS Preflight OPTIONS
         let actionType = editingId ? 'updateExpense' : 'addExpense';
         if (editingId) expenseData.id = editingId;
 
@@ -682,7 +659,6 @@
         .then(resData => {
           if (resData.status === "error") throw new Error(resData.message);
           
-          // รอรับข้อมูลล่าสุดจากการอัปเดตแผ่นงาน
           setTimeout(() => {
             fetchExpensesFromCloud();
             resetForm();
@@ -700,7 +676,6 @@
         });
 
       } else {
-        // ประมวลผลบนเครื่องคอมพิวเตอร์เมื่ออยู่ในโหมดทดลอง
         if (editingId) {
           expenses = expenses.map(item => item.id === editingId ? { ...item, ...expenseData } : item);
           showToast("อัปเดตข้อมูลจำลองแล้ว", "check-circle");
