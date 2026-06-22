@@ -46,7 +46,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-[#0D0F14] dark:text-gray-100 min-h-screen font-sans flex flex-col pb-12">
 
-  <!-- ส่วนหัวเว็บ (Header & Settings) -->
+  <!-- ส่วนหัวเว็บ (Header) -->
   <header class="sticky top-0 z-30 bg-white/80 dark:bg-[#0D0F14]/80 backdrop-blur-md border-b border-slate-200/50 dark:border-gray-800/50 px-4 py-3 transition-colors">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2">
@@ -63,11 +63,6 @@
       </div>
       
       <div class="flex items-center gap-2">
-        <!-- ปุ่มเปิดลิ้นชักการตั้งค่าเชื่อมต่อ -->
-        <button onclick="toggleSettingsModal(true)" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all relative">
-          <i data-lucide="settings" class="w-4 h-4"></i>
-          <span id="settingsAlertDot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white dark:border-[#0D0F14]"></span>
-        </button>
         <!-- ปุ่มเปิดปิดโหมดมืด -->
         <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all">
           <i id="themeIcon" data-lucide="sun" class="w-4 h-4"></i>
@@ -242,40 +237,6 @@
     </div>
   </div>
 
-  <!-- หน้าต่างลิ้นชักการตั้งค่าเชื่อมต่อคลาวด์ (Settings Drawer/Modal) -->
-  <div id="settingsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl relative">
-      <div class="flex items-center justify-between">
-        <h4 class="text-sm font-extrabold flex items-center gap-2">
-          <i data-lucide="cloud-lightning" class="w-4 h-4 text-emerald-500"></i> ตั้งค่าการเชื่อมต่อ Google Sheets
-        </h4>
-        <button onclick="toggleSettingsModal(false)" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-400">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3.5">
-        <div class="bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 p-3 rounded-2xl text-[11px] leading-relaxed border border-amber-200/50 dark:border-amber-950/30">
-          💡 <strong>คำแนะนำ:</strong> นำลิงก์ Web App URL ที่คุณทำการ Deploy (ทำให้ใช้งานได้) จากฝั่ง Google Apps Script มาวางที่นี่เพื่อให้แอปสามารถจัดเก็บข้อมูลแบบถาวรบนคลาวด์ได้
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400">Google Apps Script Web App URL</label>
-          <input type="url" id="settingsUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3.5 text-xs outline-none focus:border-emerald-500 font-mono">
-        </div>
-
-        <div class="flex gap-2">
-          <button id="testConnectionBtn" onclick="testCloudConnection()" class="flex-1 bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 text-slate-700 dark:text-gray-300 font-bold text-xs py-3 rounded-xl transition-all">
-            ทดสอบเชื่อมต่อ
-          </button>
-          <button onclick="saveSettings()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md shadow-emerald-500/10">
-            บันทึกการเชื่อมต่อ
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ระบบป็อปอัปแจ้งเตือนลอยพริ้วไหว (Floating Toasts Manager) -->
   <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -298,18 +259,14 @@
     };
 
     let expenses = [];
-    let isCloudMode = true; // เปิดใช้โหมดคลาวด์เป็นค่าเริ่มต้น
-    let webAppUrl = "https://script.google.com/macros/s/AKfycbwtzuTJEPGpG-9mS5OGt-jqjk6Ar-IZ5d6-MXiptMXo-ht6Lzh9tbsti8GkFVu2pgLi/exec"; // ฝัง URL ของคุณโดยตรง
+    let isCloudMode = true; // เปิดใช้โหมดคลาวด์เป็นค่าเริ่มต้นเสมอ
+    let webAppUrl = "https://script.google.com/macros/s/AKfycbzdrGqR8p1bhVuyLbKdYuPMYAvL0cRe7NZ5bcyqsXO2rtQGY3gZO0SU8RUJZ7P-T5Wa/exec"; // ฝัง URL ล่าสุดโดยตรง
     let editingId = null;
     let deleteIdTarget = null;
 
     // ระบบทำงานเมื่อเริ่มต้น (DOMContentLoaded)
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
-      
-      // ตั้งค่า URL แหล่งข้อมูลในกล่องตั้งค่าล่วงหน้า
-      document.getElementById('settingsUrlInput').value = webAppUrl;
-      document.getElementById('settingsAlertDot').classList.add('hidden');
       
       updateStatusBadge(true, "เชื่อมคลาวด์สด");
       fetchExpensesFromCloud();
@@ -358,13 +315,7 @@
       }
     }
 
-    // จัดการลิ้นชักการตั้งค่าคลาวด์
-    function toggleSettingsModal(show) {
-      const modal = document.getElementById('settingsModal');
-      modal.style.display = show ? 'flex' : 'none';
-    }
-
-    // โหลดฐานข้อมูลจาก LocalStorage เมื่อไม่ได้ต่อคลาวด์
+    // โหลดฐานข้อมูลจาก LocalStorage เมื่อไม่ได้ต่อคลาวด์ (กรณีระบบคลาวด์มีปัญหา)
     function loadLocalExpenses() {
       const localData = localStorage.getItem(DEMO_KEY);
       if (localData) {
@@ -411,60 +362,6 @@
         updateStatusBadge(false, "ดึงข้อมูลจากชีทไม่ได้");
         loadLocalExpenses();
       });
-    }
-
-    // บันทึกการตั้งค่า URL ใหม่
-    function saveSettings() {
-      const inputVal = document.getElementById('settingsUrlInput').value.trim();
-      if (!inputVal) {
-        webAppUrl = "";
-        isCloudMode = false;
-        document.getElementById('settingsAlertDot').classList.remove('hidden');
-        updateStatusBadge(false, "โหมดจำลอง (Demo)");
-        toggleSettingsModal(false);
-        loadLocalExpenses();
-        showToast("รีเซ็ตสถานะเป็นโหมดทดลองในเครื่องแล้ว", "info");
-        return;
-      }
-
-      if (!inputVal.startsWith("https://script.google.com/")) {
-        showToast("ที่อยู่ลิงก์ Google Script ไม่ถูกต้อง!", "alert-circle");
-        return;
-      }
-
-      webAppUrl = inputVal;
-      isCloudMode = true;
-      document.getElementById('settingsAlertDot').classList.add('hidden');
-      updateStatusBadge(true, "เชื่อมคลาวด์สด");
-      toggleSettingsModal(false);
-      fetchExpensesFromCloud();
-    }
-
-    // ฟังก์ชันทดสอบความพร้อมของการเชื่อมต่อ
-    function testCloudConnection() {
-      const inputVal = document.getElementById('settingsUrlInput').value.trim();
-      if (!inputVal) {
-        showToast("กรุณากรอก URL เว็บแอปเพื่อทดสอบ", "alert-circle");
-        return;
-      }
-
-      const btn = document.getElementById('testConnectionBtn');
-      const originalText = btn.innerText;
-      btn.innerText = "กำลังทดสอบ...";
-      btn.disabled = true;
-
-      fetch(inputVal, { method: 'GET', mode: 'cors' })
-        .then(res => res.json())
-        .then(resData => {
-          showToast("เชื่อมต่อสำเร็จ: API พร้อมทำงาน!", "check-circle");
-          btn.innerText = originalText;
-          btn.disabled = false;
-        })
-        .catch(err => {
-          showToast("เชื่อมล้มเหลว! กรุณาเช็กการตั้งค่า Deployment", "x-circle");
-          btn.innerText = originalText;
-          btn.disabled = false;
-        });
     }
 
     // แสดงผลข้อมูลและสถิติพร้อมกัน
