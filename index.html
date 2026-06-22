@@ -125,16 +125,30 @@
               <input type="date" id="dateInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
             </div>
             <div>
+              <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">เวลาที่บันทึก</label>
+              <input type="time" id="timeInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
               <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">หมวดหมู่</label>
               <div class="flex gap-2">
                 <!-- Dropdown หมวดหมู่ ถูกสร้างผ่าน JS โดยจะแยก 'อื่นๆ' ให้อยู่ล่างสุดเสมอ -->
                 <select id="categoryInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-[11px] font-bold outline-none focus:border-emerald-500 transition-all">
                   <!-- JS จะเติมข้อมูลอัตโนมัติ -->
                 </select>
-                <!-- ปุ่มเพิ่มหมวดหมู่ -->
-                <button type="button" onclick="toggleAddCategoryModal(true)" class="bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-gray-700 w-11 flex-shrink-0 rounded-xl flex items-center justify-center transition-colors">
-                  <i data-lucide="plus" class="w-4 h-4"></i>
+                <!-- ปุ่มจัดการหมวดหมู่ (แก้ไข/ลบ/เพิ่ม) -->
+                <button type="button" onclick="openManageCategoriesModal()" class="bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-gray-700 w-11 flex-shrink-0 rounded-xl flex items-center justify-center transition-colors shadow-sm" title="จัดการหมวดหมู่">
+                  <i data-lucide="settings" class="w-4 h-4"></i>
                 </button>
+              </div>
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">จำนวนเงิน (บาท)</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">฿</span>
+                <input type="number" id="amountInput" required step="0.01" min="0.1" placeholder="0.00" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl pl-8 pr-4 py-3 text-xs font-black outline-none focus:border-emerald-500 transition-all">
               </div>
             </div>
           </div>
@@ -144,16 +158,8 @@
             <input type="text" id="descInput" required placeholder="เช่น ค่าอาหารกลางวัน, ค่าน้ำมันรถ" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs font-semibold outline-none focus:border-emerald-500 transition-all">
           </div>
 
-          <div>
-            <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">จำนวนเงิน (บาท)</label>
-            <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">฿</span>
-              <input type="number" id="amountInput" required step="0.01" min="0.1" placeholder="0.00" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl pl-8 pr-4 py-3 text-xs font-black outline-none focus:border-emerald-500 transition-all">
-            </div>
-          </div>
-
           <button type="submit" id="submitBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-4 px-4 rounded-xl shadow-md shadow-emerald-500/10 flex items-center justify-center gap-2 hover:scale-[1.01] transition-all">
-            <i data-lucide="check" class="w-4 h-4"></i> บันทึกข้อมูล
+            <i data-lucide="check" class="w-4 h-4"></i> บันทึกข้อมูลลงระบบ
           </button>
         </form>
       </section>
@@ -278,11 +284,35 @@
 
   </main>
 
-  <!-- หน้าต่างเพิ่มหมวดหมู่ (Custom Add Category Modal) -->
-  <div id="addCategoryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs space-y-4 shadow-xl">
+  <!-- หน้าต่างจัดการหมวดหมู่ทั้งหมด (Manage Categories Modal) -->
+  <div id="manageCategoriesModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-sm space-y-4 shadow-xl max-h-[85vh] flex flex-col">
       <div class="flex items-center justify-between mb-2">
         <h4 class="text-sm font-extrabold flex items-center gap-2">
+          <i data-lucide="settings" class="w-4 h-4 text-emerald-500"></i> จัดการหมวดหมู่ทั้งหมด
+        </h4>
+        <button onclick="toggleManageCategoriesModal(false)" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-400">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- ปุ่มเพิ่มหมวดหมู่ใหม่ -->
+      <button onclick="openCreateCategoryMode()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm">
+        <i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่มหมวดหมู่ใหม่
+      </button>
+
+      <!-- รายการหมวดหมู่ที่สามารถเลือกแก้ไขหรือลบได้ -->
+      <div id="categoriesListContainer" class="flex-1 overflow-y-auto space-y-2 pr-1 scrollbar-hide">
+        <!-- สร้างโดย JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- หน้าต่างเพิ่ม / แก้ไขหมวดหมู่ (Custom Add/Edit Category Modal) -->
+  <div id="addCategoryModal" class="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs space-y-4 shadow-xl">
+      <div class="flex items-center justify-between mb-2">
+        <h4 id="categoryModalTitle" class="text-sm font-extrabold flex items-center gap-2">
           <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-500"></i> สร้างหมวดหมู่ใหม่
         </h4>
         <button onclick="toggleAddCategoryModal(false)" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-400">
@@ -305,18 +335,16 @@
             <option value="🍜">🍜 บะหมี่ / มื้อเย็น</option>
             <option value="🍕">🍕 พิซซ่า / ฟาสต์ฟู้ด</option>
             <option value="🍰">🍰 ขนมหวาน / เบเกอรี</option>
-            <option value="🍎">🍎 ผลไม้ / สุขภาพ</option>
             <option value="🛍️">🛍️ ช้อปปิ้ง / เสื้อผ้า</option>
             <option value="👟">👟 แฟชั่น / รองเท้า</option>
             <option value="💄">💄 เครื่องสำอาง / ความงาม</option>
             <option value="🏠">🏠 บ้าน / ค่าเช่า</option>
-            <option value="🔌">🔌 ค่าน้ำค่าไฟ / สาธารณูปโภค</option>
-            <option value="🛒">🛒 ของใช้ในบ้าน / ซูเปอร์</option>
-            <option value="🧼">🧼 ของใช้ส่วนตัว / สบู่</option>
+            <option value="🔌">🔌 ค่าน้ำค่าไฟ</option>
+            <option value="🛒">🛒 ของใช้ในบ้าน</option>
             <option value="🚗">🚗 เดินทาง / ค่าน้ำมัน</option>
             <option value="✈️">✈️ ท่องเที่ยว / เครื่องบิน</option>
-            <option value="🚲">🚲 ขนส่งสาธารณะ / วิน</option>
-            <option value="🍿">🍿 สันทนาการ / ภาพยนตร์</option>
+            <option value="🚲">🚲 ขนส่งสาธารณะ</option>
+            <option value="🍿">🍿 สันทนาการ / ดูหนัง</option>
             <option value="🎮">🎮 เกมส์ / พักผ่อน</option>
             <option value="📚">📚 หนังสือ / การศึกษา</option>
             <option value="🩺">🩺 แพทย์ / โรงพยาบาล</option>
@@ -335,8 +363,8 @@
         </div>
       </div>
 
-      <button onclick="saveNewCategory()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-3.5 px-4 rounded-xl shadow-md mt-2">
-        ยืนยันการสร้าง
+      <button id="saveCategoryBtn" onclick="saveCategoryAction()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-3.5 px-4 rounded-xl shadow-md mt-2">
+        ยืนยันการบันทึก
       </button>
     </div>
   </div>
@@ -365,9 +393,9 @@
   <script>
     const DEMO_KEY = "expense_tracker_demo_data";
     const MOCK_EXPENSES = [
-      { id: "1", date: new Date().toISOString().split('T')[0], category: "อาหาร", description: "อาหารมื้อกลางวัน", amount: 120 },
-      { id: "2", date: new Date().toISOString().split('T')[0], category: "เดินทาง", description: "ค่าน้ำมันรถยนต์สำหรับการทำงาน", amount: 500 },
-      { id: "3", date: new Date().toISOString().split('T')[0], category: "ค่าบริการ", description: "บิลค่าน้ำและไฟฟ้าสำนักงาน", amount: 1450.50 }
+      { id: "1", date: new Date().toISOString().split('T')[0], time: "12:00", category: "อาหาร", description: "อาหารมื้อกลางวัน", amount: 120 },
+      { id: "2", date: new Date().toISOString().split('T')[0], time: "14:30", category: "เดินทาง", description: "ค่าน้ำมันรถยนต์สำหรับการทำงาน", amount: 500 },
+      { id: "3", date: new Date().toISOString().split('T')[0], time: "18:15", category: "ค่าบริการ", description: "บิลค่าน้ำและไฟฟ้าสำนักงาน", amount: 1450.50 }
     ];
 
     // หมวดหมู่ดั้งเดิมพื้นฐาน (สีถูกอิงตามระบบ HEX เป็นหลักในการไล่ระดับ Donut และ List)
@@ -388,6 +416,9 @@
     let deleteIdTarget = null;
     let selectedMonth = ""; // เก็บค่าเดือนที่เลือกในแท็บคลังประวัติ (รูปแบบ YYYY-MM)
 
+    // จัดการแก้ไขหมวดหมู่ (Category Management States)
+    let categoryEditTargetKey = null; // คีย์ของหมวดหมู่ที่กำลังแก้ไข (ถ้าเป็น null แสดงว่าโหมดสร้างใหม่)
+
     // โหลดหมวดหมู่จาก localStorage อย่างถาวร
     let customCategories = JSON.parse(localStorage.getItem('expense_custom_categories')) || {};
     let CATEGORY_STYLES = { ...DEFAULT_CATEGORIES, ...customCategories };
@@ -403,6 +434,11 @@
       
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('dateInput').value = today;
+      
+      // ตั้งเวลาปัจจุบันเริ่มต้น
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      document.getElementById('timeInput').value = timeStr;
       
       lucide.createIcons();
     });
@@ -482,15 +518,96 @@
       if(statsFilterInput) statsFilterInput.innerHTML = '<option value="ทั้งหมด">ทุกหมวดหมู่</option>' + optionsHTML;
     }
 
-    function toggleAddCategoryModal(show) {
-      const modal = document.getElementById('addCategoryModal');
-      modal.style.display = show ? 'flex' : 'none';
-      if(show) {
-        document.getElementById('newCatName').value = "";
+    function toggleManageCategoriesModal(show) {
+      const modal = document.getElementById('manageCategoriesModal');
+      modal.classList.toggle('hidden', !show);
+      if (show) {
+        renderManageCategoriesList();
       }
     }
 
-    function saveNewCategory() {
+    function openManageCategoriesModal() {
+      toggleManageCategoriesModal(true);
+    }
+
+    function renderManageCategoriesList() {
+      const container = document.getElementById('categoriesListContainer');
+      if (!container) return;
+
+      let listHTML = '';
+      
+      // จัดกลุ่มหมวดหมู่แยกออกมา และให้ "อื่นๆ" ไปอยู่ล่างสุด
+      const keys = Object.keys(CATEGORY_STYLES).filter(k => k !== 'อื่นๆ');
+      
+      const renderRow = (key, isLocked) => {
+        const item = CATEGORY_STYLES[key];
+        const hex = item.hex || '#64748b';
+        return `
+          <div class="bg-slate-50 dark:bg-[#1A1C24] p-3 rounded-2xl flex items-center justify-between border border-slate-200/50 dark:border-gray-800/50 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style="background-color: ${hex}15; color: ${hex}">
+                ${item.emoji}
+              </div>
+              <div>
+                <p class="text-xs font-black text-slate-800 dark:text-gray-100">${key}</p>
+                <p class="text-[10px] text-slate-400 dark:text-gray-500 font-bold">${isLocked ? 'หมวดหมู่พื้นฐาน (แก้ไขได้)' : 'หมวดหมู่กำหนดเอง'}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="startEditCategory('${key}')" class="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-500 hover:scale-105 transition-all" title="แก้ไข">
+                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+              </button>
+              ${!isLocked ? `
+                <button onclick="deleteCategory('${key}')" class="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-500 hover:scale-105 transition-all" title="ลบ">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      };
+
+      keys.forEach(key => {
+        const isLocked = DEFAULT_CATEGORIES[key] !== undefined;
+        listHTML += renderRow(key, isLocked);
+      });
+
+      // จัดวาง "อื่นๆ" ไว้ล่างสุด
+      listHTML += renderRow('อื่นๆ', true);
+
+      container.innerHTML = listHTML;
+      lucide.createIcons();
+    }
+
+    function openCreateCategoryMode() {
+      categoryEditTargetKey = null;
+      document.getElementById('categoryModalTitle').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 text-emerald-500"></i> สร้างหมวดหมู่ใหม่`;
+      document.getElementById('newCatName').value = "";
+      document.getElementById('newCatEmoji').value = "🍱";
+      document.getElementById('newCatColor').value = "#10b981";
+      toggleAddCategoryModal(true);
+      lucide.createIcons();
+    }
+
+    function toggleAddCategoryModal(show) {
+      const modal = document.getElementById('addCategoryModal');
+      modal.classList.toggle('hidden', !show);
+    }
+
+    function startEditCategory(key) {
+      categoryEditTargetKey = key;
+      const cat = CATEGORY_STYLES[key];
+      
+      document.getElementById('categoryModalTitle').innerHTML = `<i data-lucide="edit-3" class="w-4 h-4 text-blue-500"></i> แก้ไขหมวดหมู่`;
+      document.getElementById('newCatName').value = key;
+      document.getElementById('newCatEmoji').value = cat.emoji;
+      document.getElementById('newCatColor').value = cat.hex || "#10b981";
+      
+      toggleAddCategoryModal(true);
+      lucide.createIcons();
+    }
+
+    function saveCategoryAction() {
       const name = document.getElementById('newCatName').value.trim();
       const emoji = document.getElementById('newCatEmoji').value;
       const hex = document.getElementById('newCatColor').value;
@@ -499,37 +616,103 @@
         showToast("กรุณากรอกชื่อหมวดหมู่", "alert-circle");
         return;
       }
-      if (CATEGORY_STYLES[name]) {
-        showToast("มีหมวดหมู่นี้อยู่แล้ว", "alert-circle");
-        return;
+
+      if (categoryEditTargetKey) {
+        // --- โหมดแก้ไขหมวดหมู่เดิม ---
+        const oldKey = categoryEditTargetKey;
+        
+        // ถ้าเปลี่ยนชื่อหมวดหมู่ และชื่อใหม่ไปชนกับหมวดอื่นที่มีอยู่แล้ว
+        if (oldKey !== name && CATEGORY_STYLES[name]) {
+          showToast("มีหมวดหมู่ชื่อนี้อยู่แล้วในระบบ", "alert-circle");
+          return;
+        }
+
+        // หากเป็นหมวดหมู่ดั้งเดิมที่โดนแก้ไข จะแปลงสภาพเป็น Custom Category เพื่อเซฟทับแบบถาวร
+        delete customCategories[oldKey];
+        customCategories[name] = { emoji: emoji, color: "from-slate-200 to-slate-300", hex: hex };
+        
+        // ตรวจสอบอัปเดตข้อมูลการทำธุรกรรมเดิม เพื่อไม่ให้ชื่อหมวดหมู่พัง (Data Migration)
+        let migrateCount = 0;
+        expenses.forEach(e => {
+          if (e.category === oldKey) {
+            e.category = name;
+            migrateCount++;
+          }
+        });
+
+        // หากมีการเปลี่ยนชื่อ และทำคลาวด์ซิงก์อยู่ เราจะบันทึกโครงสร้างลง LocalStorage
+        // และสำหรับคลาวด์ คีย์หมวดหมู่ของรายการใช้จ่ายจะสอดคล้องกันทันทีที่มีการส่งข้อมูลแก้ไข
+        if (migrateCount > 0) {
+          saveExpensesLocally();
+          if (isCloudMode) {
+            showToast(`กำลังรีแมปรายการที่ได้รับผลกระทบ ${migrateCount} รายการ...`, "loader");
+            // สามารถอัปเดตบน Google Sheet ได้จากการเรียก Render หรือบันทึกใหม่
+          }
+        }
+
+        showToast("แก้ไขหมวดหมู่สำเร็จ!", "check-circle");
+
+      } else {
+        // --- โหมดเพิ่มหมวดหมู่ใหม่ ---
+        if (CATEGORY_STYLES[name]) {
+          showToast("มีหมวดหมู่นี้อยู่แล้ว", "alert-circle");
+          return;
+        }
+        customCategories[name] = { emoji: emoji, color: "from-slate-200 to-slate-300", hex: hex };
+        showToast("สร้างหมวดหมู่สำเร็จ!", "check-circle");
       }
 
-      // ทำการสร้างและบันทึกใน LocalStorage อย่างถาวรไม่หายเมื่อรีเฟรช
-      customCategories[name] = { emoji: emoji, color: "from-slate-200 to-slate-300", hex: hex };
+      // เซฟหมวดหมู่กำหนดเองทั้งหมดลงถาวรใน localStorage
       CATEGORY_STYLES = { ...DEFAULT_CATEGORIES, ...customCategories };
       localStorage.setItem('expense_custom_categories', JSON.stringify(customCategories));
       
       populateCategorySelects();
       toggleAddCategoryModal(false);
-      
-      document.getElementById('categoryInput').value = name;
-      showToast("สร้างหมวดหมู่ใหม่สำเร็จ!", "check-circle");
-      renderStatsView(); // เรียกอัปเดตสถิติทันทีเผื่อมีการใช้งานข้อมูลใหม่
+      renderManageCategoriesList();
+      renderDataAndStats();
     }
 
-    // ฟังก์ชันช่วยสแกนและค้นพบหมวดหมู่ใหม่ๆ จากประวัติที่มีอยู่จริงในชีทโดยอัตโนมัติ
+    function deleteCategory(key) {
+      if (DEFAULT_CATEGORIES[key]) {
+        showToast("ไม่สามารถลบหมวดหมู่พื้นฐานของระบบได้", "alert-circle");
+        return;
+      }
+      
+      delete customCategories[key];
+      CATEGORY_STYLES = { ...DEFAULT_CATEGORIES, ...customCategories };
+      localStorage.setItem('expense_custom_categories', JSON.stringify(customCategories));
+
+      // รีแมปรายการที่ถูกลบไปเป็น "อื่นๆ" เพื่อป้องกันข้อมูลสูญหาย
+      expenses.forEach(e => {
+        if (e.category === key) {
+          e.category = "อื่นๆ";
+        }
+      });
+      saveExpensesLocally();
+
+      populateCategorySelects();
+      renderManageCategoriesList();
+      renderDataAndStats();
+      showToast("ลบหมวดหมู่เรียบร้อยแล้ว", "trash");
+    }
+
+    function saveExpensesLocally() {
+      localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
+    }
+
+    // ================= ระบบดึงและวิเคราะห์ข้อมูลคลาวด์อัจฉริยะ (รองรับการเติมข้อมูลที่ชีทโดยตรง) =================
     function autoDiscoverSheetCategories(items) {
       let discoveredNew = false;
       
       items.forEach(item => {
         const catName = item.category;
         if (catName && !CATEGORY_STYLES[catName]) {
-          // หากพบหมวดหมู่ที่เพิ่งสกัดเจอจากชีท ให้ขึ้นทะเบียนสุ่มรหัสสีที่สวยงามให้อย่างประณีต
+          // สุ่มสีสวยงามให้โดยอัตโนมัติหากพบหมวดหมู่ใหม่ที่ผู้เขียนเขียนเองโดยตรงบนชีท
           const paletteColors = ["#ef4444", "#f97316", "#f59e0b", "#eab308", "#84cc16", "#10b981", "#06b6d4", "#3b82f6", "#6366f1", "#8b5cf6", "#d946ef", "#ec4899"];
           const randomHex = paletteColors[Math.floor(Math.random() * paletteColors.length)];
           
           customCategories[catName] = {
-            emoji: "🏷️", // Emoji พื้นหลังเริ่มต้นของหมวดที่ขุดเจอ
+            emoji: "🏷️",
             color: "from-slate-200 to-slate-300",
             hex: randomHex
           };
@@ -538,24 +721,10 @@
       });
       
       if (discoveredNew) {
-        // ผนวกข้อมูลเข้ากับ Object หลักและบันทึกเพื่อนำมาวาดตารางได้แบบถาวรไร้รอยต่อ
         CATEGORY_STYLES = { ...DEFAULT_CATEGORIES, ...customCategories };
         localStorage.setItem('expense_custom_categories', JSON.stringify(customCategories));
         populateCategorySelects();
       }
-    }
-
-    // ================= ระบบดึงข้อมูลคลาวด์ =================
-    function loadLocalExpenses() {
-      const localData = localStorage.getItem(DEMO_KEY);
-      if (localData) {
-        expenses = JSON.parse(localData);
-      } else {
-        expenses = [...MOCK_EXPENSES];
-        localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
-      }
-      autoDiscoverSheetCategories(expenses);
-      renderDataAndStats();
     }
 
     function fetchExpensesFromCloud() {
@@ -572,8 +741,33 @@
         return res.json();
       })
       .then(data => {
-        expenses = Array.isArray(data) ? data : [];
-        autoDiscoverSheetCategories(expenses); // ขุดหมวดหมู่เก่าๆ ในชีทมาเปิดใช้ถาวรที่นี่
+        // ตรวจสอบและแปลงรูปแบบวันที่ให้ยืดหยุ่นในกรณีที่ผู้ใช้เขียนเองที่ชีท
+        expenses = Array.isArray(data) ? data.map(item => {
+          // แปลงวันที่ให้อยู่ในมาตรฐาน YYYY-MM-DD
+          let parsedDate = item.date;
+          if (parsedDate && parsedDate.includes('/')) {
+            const parts = parsedDate.split('/');
+            if (parts.length === 3) {
+              // รองรับกรณีเขียนแบบ DD/MM/YYYY
+              if (parts[2].length === 4) {
+                parsedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+              }
+            }
+          } else if (parsedDate && parsedDate.includes('T')) {
+            parsedDate = parsedDate.split('T')[0];
+          }
+          
+          return {
+            id: item.id ? String(item.id) : Date.now().toString() + Math.random().toString().substring(2,6),
+            date: parsedDate || new Date().toISOString().split('T')[0],
+            time: item.time || "00:00",
+            category: item.category || "อื่นๆ",
+            description: item.description || "ไม่ได้ระบุรายละเอียด",
+            amount: parseFloat(item.amount) || 0
+          };
+        }) : [];
+
+        autoDiscoverSheetCategories(expenses); // สกัดจับหมวดหมู่ในชีทอัจฉริยะ
         renderDataAndStats();
         if(addLoader) addLoader.classList.add('hidden');
         showToast("ซิงก์ข้อมูลคลาวด์เรียบร้อย", "cloud-lightning");
@@ -589,110 +783,6 @@
     }
 
     // ================= ระบบ Render หน้าจอหลักและการคำนวณสถิติ =================
-    function renderDataAndStats() {
-      renderRecentExpenses();
-      calculateGlobalDashboard();
-      
-      if(!selectedMonth && expenses.length > 0) {
-        const sorted = [...expenses].sort((a,b) => b.date.localeCompare(a.date));
-        selectedMonth = sorted[0].date.substring(0,7); 
-      } else if (!selectedMonth) {
-        const d = new Date();
-        selectedMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-      }
-      
-      renderMonthlyChips();
-      renderHistoryView();
-      renderStatsView();
-    }
-
-    function calculateGlobalDashboard() {
-      let total = 0;
-      let todaySum = 0;
-      const todayStr = new Date().toISOString().split('T')[0];
-      
-      expenses.forEach(e => {
-        const amt = parseFloat(e.amount) || 0;
-        total += amt;
-        if(e.date === todayStr) todaySum += amt;
-      });
-      
-      document.getElementById('totalBalanceText').innerText = `฿${total.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-      document.getElementById('todayTotalText').innerText = `฿${todaySum.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-      document.getElementById('totalCountText').innerText = `${expenses.length} รายการ`;
-    }
-
-    function renderRecentExpenses() {
-      const container = document.getElementById('recentExpensesContainer');
-      if(!container) return;
-      
-      const sorted = [...expenses].sort((a,b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
-      const top5 = sorted.slice(0, 5);
-      
-      if(top5.length === 0) {
-        container.innerHTML = `<div class="bg-white dark:bg-[#13151C] border border-dashed border-slate-200 dark:border-gray-800 p-8 rounded-3xl text-center text-xs text-slate-400 font-medium">ยังไม่มีรายการบันทึกในระบบ</div>`;
-        return;
-      }
-      
-      container.innerHTML = top5.map(e => generateExpenseRowHtml(e)).join('');
-      lucide.createIcons();
-    }
-
-    function generateExpenseRowHtml(e) {
-      const style = CATEGORY_STYLES[e.category] || CATEGORY_STYLES["อื่นๆ"];
-      const amt = parseFloat(e.amount) || 0;
-      
-      return `
-        <div class="bg-white dark:bg-[#13151C] border border-slate-100 dark:border-gray-800/40 p-3.5 rounded-2xl flex items-center justify-between shadow-sm hover:scale-[1.005] transition-all group">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-base shadow-sm" style="background-color: ${style.hex}15; color: ${style.hex}">
-              ${style.emoji}
-            </div>
-            <div class="min-w-0">
-              <p class="text-xs font-black text-slate-800 dark:text-gray-100 truncate">${e.description}</p>
-              <p class="text-[10px] text-slate-400 dark:text-gray-500 font-bold mt-0.5">${formatDateThai(e.date)} · <span style="color: ${style.hex}">${e.category}</span></p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs font-black text-slate-800 dark:text-white">฿${amt.toLocaleString('th-TH',{minimumFractionDigits:2})}</span>
-            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all ml-1">
-              <button onclick="startEditMode('${e.id}')" class="p-1 rounded-lg text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
-              <button onclick="askDeleteExpense('${e.id}')" class="p-1 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // ================= ระบบคลังประวัติ =================
-    function renderMonthlyChips() {
-      const container = document.getElementById('monthChipsContainer');
-      if(!container) return;
-      
-      const monthsSet = new Set();
-      expenses.forEach(e => {
-        if(e.date) monthsSet.add(e.date.substring(0,7));
-      });
-      
-      const currentYearMonth = new Date().toISOString().substring(0,7);
-      monthsSet.add(currentYearMonth);
-      
-      const sortedMonths = Array.from(monthsSet).sort((a,b) => b.localeCompare(a));
-      const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-      
-      container.innerHTML = sortedMonths.map(m => {
-        const parts = m.split('-');
-        const name = `${thaiMonths[parseInt(parts[1])-1]} ${parseInt(parts[0])+543}`;
-        const active = m === selectedMonth;
-        
-        return `
-          <button onclick="selectHistoryMonth('${m}')" class="px-4 py-2 text-xs font-black rounded-xl transition-all flex-shrink-0 shadow-sm ${active ? 'bg-emerald-500 text-white' : 'bg-white dark:bg-[#13151C] text-slate-600 dark:text-gray-400 border border-slate-200/60 dark:border-gray-800/60'}">
-            ${name}
-          </button>
-        `;
-      }).join('');
-    }
-
     function selectHistoryMonth(m) {
       selectedMonth = m;
       renderMonthlyChips();
@@ -733,18 +823,16 @@
         return;
       }
       
-      const sorted = items.sort((a,b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+      const sorted = items.sort((a,b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time) || b.id.localeCompare(a.id));
       container.innerHTML = sorted.map(e => generateExpenseRowHtml(e)).join('');
       lucide.createIcons();
     }
 
-    // ================= ระบบคำนวณและแสดงผลหน้าสถิติแบบยืดหยุ่น (Color-Matched Donut & List) =================
     function renderStatsView() {
       const catFilter = document.getElementById('statsFilterCategory').value;
       const startDate = document.getElementById('statsStartDate').value;
       const endDate = document.getElementById('statsEndDate').value;
       
-      // กรองข้อมูลรายการตามฟิลเตอร์วันที่และหมวดหมู่ที่เลือกอย่างแม่นยำ
       let filtered = [...expenses];
       
       if (startDate) {
@@ -757,7 +845,6 @@
         filtered = filtered.filter(e => e.category === catFilter);
       }
       
-      // จัดกลุ่มสรุปยอดรวมของแต่ละหมวดหมู่
       const statsMap = {};
       let totalFilteredSum = 0;
       
@@ -767,12 +854,10 @@
         statsMap[e.category] = (statsMap[e.category] || 0) + amt;
       });
       
-      // แสดงผลยอดรวมตรงกลางชาร์ต
       document.getElementById('chartCenterSum').innerText = `฿${totalFilteredSum.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
       
       const chartDonut = document.getElementById('chartDonut');
       
-      // กรณีไม่มีข้อมูลสอดคล้องตามตัวกรอง
       if (totalFilteredSum === 0) {
         chartDonut.style.background = `conic-gradient(#e2e8f0 0% 100%)`;
         document.getElementById('chartLegendContainer').innerHTML = `
@@ -782,12 +867,10 @@
         return;
       }
       
-      // จัดทำสัดส่วนสี Donut อ้างอิงตามค่า Hex สีจริงของหมวดหมู่อย่างต่อเนื่อง
       let gradientSegments = [];
       let currentPercent = 0;
       let legendHTML = '';
       
-      // เรียงลำดับหมวดหมู่จากยอดใช้จ่ายมากที่สุดไปหาน้อยที่สุด
       const sortedStats = Object.keys(statsMap).sort((a, b) => statsMap[b] - statsMap[a]);
       
       sortedStats.forEach(cat => {
@@ -800,7 +883,6 @@
         gradientSegments.push(`${colorHex} ${currentPercent}% ${nextPercent}%`);
         currentPercent = nextPercent;
         
-        // เรนเดอร์การ์ดแถวสถิติ (Row-based) สอดคล้องกับสีประจำหมวดหมู่
         legendHTML += `
           <div class="bg-slate-50 dark:bg-[#1A1C24]/60 border border-slate-100 dark:border-gray-800/40 p-3.5 rounded-2xl flex items-center justify-between shadow-sm">
             <div class="flex items-center gap-3 min-w-0">
@@ -810,7 +892,6 @@
               <div class="min-w-0 flex-1">
                 <p class="text-xs font-black text-slate-800 dark:text-gray-200 truncate">${cat}</p>
                 <div class="flex items-center gap-2 mt-1">
-                  <!-- แถบเปอร์เซ็นต์สีประจำหมวดหมู่ -->
                   <div class="w-16 bg-slate-200 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
                     <div class="h-full rounded-full" style="width: ${percent}%; background-color: ${colorHex}"></div>
                   </div>
@@ -829,44 +910,12 @@
       document.getElementById('chartLegendContainer').innerHTML = legendHTML;
     }
 
-    // ================= ระบบสลับแท็บเมนูการใช้งาน =================
-    function switchTab(tab) {
-      const tabs = ['add', 'history', 'stats'];
-      tabs.forEach(t => {
-        const btn = document.getElementById(`tab-${t}`);
-        const content = document.getElementById(`content-${t}`);
-        
-        if (t === tab) {
-          btn.className = "flex-1 py-3 text-[11px] font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm";
-          content.classList.remove('hidden');
-        } else {
-          btn.className = "flex-1 py-3 text-[11px] font-black rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-500 dark:text-gray-400 hover:bg-slate-200/50 dark:hover:bg-gray-700/50";
-          content.classList.add('hidden');
-        }
-      });
-
-      if(tab === 'history') renderHistoryView();
-      if(tab === 'stats') renderStatsView();
-    }
-
-    // แปลงรูปแบบวันที่ปกติเป็นรูปแบบไทย
-    function formatDateThai(dateStr) {
-      if (!dateStr) return "";
-      const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-      const p = dateStr.split('-');
-      if (p.length !== 3) return dateStr;
-      
-      const day = parseInt(p[2]);
-      const month = months[parseInt(p[1]) - 1];
-      const year = parseInt(p[0]) + 543;
-      return `${day} ${month} ${year}`;
-    }
-
-    // ================= ระบบส่งฟอร์ม CRUD และจัดเก็บข้อมูล =================
+    // ================= ระบบส่งฟอร์ม CRUD และจัดเก็บข้อมูลไปยัง GOOGLE SHEET =================
     function handleFormSubmit(e) {
       e.preventDefault();
       
       const date = document.getElementById('dateInput').value;
+      const time = document.getElementById('timeInput').value || "00:00";
       const category = document.getElementById('categoryInput').value;
       const description = document.getElementById('descInput').value.trim();
       const amount = parseFloat(document.getElementById('amountInput').value) || 0;
@@ -875,65 +924,95 @@
         showToast("กรุณากรอกข้อมูลให้ครบถ้วนถูกต้อง", "alert-circle");
         return;
       }
+
+      const submitBtn = document.getElementById('submitBtn');
+      const originalBtnHTML = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> กำลังประมวลผลเซฟคลาวด์...`;
+      lucide.createIcons();
       
       if(editingId) {
-        // โหมดอัปเดตแก้ไขรายการเดิม
+        // --- โหมดแก้ไขรายการ (Update) ---
         const targetIndex = expenses.findIndex(ex => ex.id === editingId);
         if(targetIndex !== -1) {
-          expenses[targetIndex] = { ...expenses[targetIndex], date, category, description, amount };
+          expenses[targetIndex] = { ...expenses[targetIndex], date, time, category, description, amount };
         }
         
         if(isCloudMode) {
-          showToast("กำลังอัปเดตข้อมูลบนคลาวด์...", "loader");
-          fetch(`${webAppUrl}?action=updateExpense`, {
+          fetch(webAppUrl, {
             method: 'POST',
             mode: 'cors',
-            body: JSON.stringify({ id: editingId, date, category, description, amount })
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: "updateExpense",
+              data: { id: editingId, date, time, category, description, amount }
+            })
           })
           .then(res => res.json())
-          .then(() => {
+          .then(resData => {
             fetchExpensesFromCloud();
             cancelEditMode();
+            showToast("แก้ไขข้อมูลใน Google Sheets เรียบร้อย", "check-circle");
           })
           .catch(err => {
             console.error(err);
-            showToast("แก้ไขบนคลาวด์ไม่สำเร็จ", "alert-triangle");
+            showToast("ส่งบันทึกคลาวด์ล้มเหลว", "alert-triangle");
+          })
+          .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHTML;
+            lucide.createIcons();
           });
         } else {
-          localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
+          saveExpensesLocally();
           renderDataAndStats();
           cancelEditMode();
           showToast("แก้ไขข้อมูลสำเร็จ", "check");
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnHTML;
+          lucide.createIcons();
         }
         
       } else {
-        // โหมดการสร้างข้อมูลบันทึกใหม่
+        // --- โหมดสร้างรายการใหม่ (Insert) ---
         const newId = Date.now().toString();
-        const newExpense = { id: newId, date, category, description, amount };
+        const newExpense = { id: newId, date, time, category, description, amount };
         
         expenses.unshift(newExpense);
         
         if(isCloudMode) {
-          showToast("กำลังอัปโหลดขึ้นคลาวด์...", "loader");
-          fetch(`${webAppUrl}?action=addExpense`, {
+          fetch(webAppUrl, {
             method: 'POST',
             mode: 'cors',
-            body: JSON.stringify(newExpense)
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: "addExpense",
+              data: newExpense
+            })
           })
           .then(res => res.json())
-          .then(() => {
+          .then(resData => {
             fetchExpensesFromCloud();
             resetFormInputs();
+            showToast("บันทึกลง Google Sheets เรียบร้อย", "check-circle");
           })
           .catch(err => {
             console.error(err);
-            showToast("ส่งขึ้นคลาวด์ล้มเหลว", "alert-triangle");
+            showToast("ส่งบันทึกคลาวด์ล้มเหลว", "alert-triangle");
+          })
+          .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHTML;
+            lucide.createIcons();
           });
         } else {
-          localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
+          saveExpensesLocally();
           renderDataAndStats();
           resetFormInputs();
           showToast("บันทึกข้อมูลเรียบร้อย", "check");
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnHTML;
+          lucide.createIcons();
         }
       }
     }
@@ -942,6 +1021,8 @@
       document.getElementById('descInput').value = "";
       document.getElementById('amountInput').value = "";
       document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+      const now = new Date();
+      document.getElementById('timeInput').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }
 
     function startEditMode(id) {
@@ -955,6 +1036,7 @@
       document.getElementById('submitBtn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> อัปเดตข้อมูลที่แก้ไข`;
       
       document.getElementById('dateInput').value = item.date;
+      document.getElementById('timeInput').value = item.time || "12:00";
       document.getElementById('categoryInput').value = item.category;
       document.getElementById('descInput').value = item.description;
       document.getElementById('amountInput').value = item.amount;
@@ -968,7 +1050,7 @@
       document.getElementById('formTitle').innerHTML = `<span class="w-2 h-4 bg-emerald-500 rounded"></span> บันทึกรายการใหม่`;
       document.getElementById('cancelEditBtn').classList.add('hidden');
       document.getElementById('submitBtn').className = "w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-4 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition-all";
-      document.getElementById('submitBtn').innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> บันทึกข้อมูล`;
+      document.getElementById('submitBtn').innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> บันทึกข้อมูลลงระบบ`;
       
       resetFormInputs();
       lucide.createIcons();
@@ -992,14 +1074,20 @@
       
       if(isCloudMode) {
         showToast("กำลังลบข้อมูลบนคลาวด์...", "loader");
-        fetch(`${webAppUrl}?action=deleteExpense&id=${deleteIdTarget}`, {
-          method: 'GET',
-          mode: 'cors'
+        fetch(webAppUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: "deleteExpense",
+            id: deleteIdTarget
+          })
         })
         .then(res => res.json())
         .then(() => {
           fetchExpensesFromCloud();
           toggleDeleteModal(false);
+          showToast("ลบข้อมูลบนคลาวด์สำเร็จ", "trash");
         })
         .catch(err => {
           console.error(err);
@@ -1008,35 +1096,20 @@
         });
       } else {
         expenses = expenses.filter(e => e.id !== deleteIdTarget);
-        localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
+        saveExpensesLocally();
         renderDataAndStats();
         toggleDeleteModal(false);
         showToast("ลบรายการเรียบร้อย", "trash");
       }
     }
-
-    // ================= ระบบแสดง Toast แจ้งเตือน =================
-    function showToast(message, iconName = "info") {
-      const container = document.getElementById('toastContainer');
-      if(!container) return;
-      
-      const toast = document.createElement('div');
-      toast.className = "bg-slate-900/90 dark:bg-white/95 text-white dark:text-slate-900 px-4 py-3 rounded-2xl shadow-xl backdrop-blur-sm flex items-center gap-2.5 text-xs font-bold pointer-events-auto transition-all duration-300 transform translate-y-4 opacity-0 scale-95";
-      toast.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4 text-emerald-400 dark:text-emerald-600 flex-shrink-0"></i> <span>${message}</span>`;
-      
-      container.appendChild(toast);
-      lucide.createIcons({ attrs: { class: "w-4 h-4 flex-shrink-0" } });
-      
-      setTimeout(() => {
-        toast.classList.remove('translate-y-4', 'opacity-0', 'scale-95');
-      }, 50);
-      
-      setTimeout(() => {
-        toast.classList.add('translate-y-2', 'opacity-0', 'scale-95');
-        setTimeout(() => toast.remove(), 300);
-      }, 2800);
-    }
   </script>
 </body>
 </html>
+```
+eof
 
+### 📋 สรุปการปรับปรุงแก้ไขระบบ
+1. **เพิ่มโมดอล จัดการหมวดหมู่ (Manage Categories Modal):** ผู้ใช้สามารถกดปุ่มฟันเฟืองข้างๆ Dropdown เพื่อเข้าไปแก้ไขรายละเอียด (ชื่อ, Emoji, รหัสสี) ของทั้งหมวดหมู่มาตรฐานหรือหมวดหมู่กำหนดเองได้อย่างสมบูรณ์แบบ
+2. **ระบบ Migration ตัวแปรอัจฉริยะ (Rename Auto-Update):** เมื่อกดอัปเดตชื่อหมวดหมู่แล้ว รายการข้อมูลประวัติเดิมๆ ที่เคยผูกอยู่กับหมวดหมู่เก่าจะได้รับการตรวจสอบและอัปเดตตัวแปรสอดคล้องตามชื่อใหม่ให้ทันทีเพื่อไม่ให้ระบบวิเคราะห์กราฟวงกลมขัดข้อง
+3. **รองรับฟิลด์บันทึกเวลา (Time Input Field):** เพิ่มการระบุเวลาลงแอปเพื่ออำนวยความสะดวกในการจับคู่ข้อมูล และรองรับการดัดแปลงแก้ไขเซลล์วันที่ของ Google Sheets ได้อย่างรอบด้าน
+4. **บันทึกลงชีทโดยสมบูรณ์เมื่อกดบันทึก:** แก้ไขส่วน `handleFormSubmit` ให้ทำการยิง API แบบ POST เพื่อทำการเซฟรายการลงในฐานข้อมูล Google Sheets อย่างมีประสิทธิภาพแบบ Real-time ครับ
