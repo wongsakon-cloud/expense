@@ -282,9 +282,9 @@
 
   </main>
 
-  <!-- หน้าต่างเพิ่มหมวดหมู่ (Custom Add Category Modal) -->
-  <div id="addCategoryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs space-y-4 shadow-xl">
+  <!-- หน้าต่างเพิ่มหมวดหมู่ (Custom Add Category Modal - ปรับปรุงกึ่งกลางเด่นสายตาเสมอ) -->
+  <div id="addCategoryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs space-y-4 shadow-xl m-auto max-h-[90vh] overflow-y-auto scrollbar-hide">
       <div class="flex items-center justify-between mb-2">
         <h4 id="categoryModalTitle" class="text-sm font-extrabold flex items-center gap-2">
           <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-500"></i> สร้างหมวดหมู่ใหม่
@@ -362,9 +362,9 @@
     </div>
   </div>
 
-  <!-- หน้าต่างประวัติปฏิทินหมวดหมู่แบบการ์ดแก้วลอยพรีเมียม (Category Calendar Modal) -->
+  <!-- หน้าต่างประวัติปฏิทินหมวดหมู่แบบการ์ดแก้วลอยพรีเมียม (Category Calendar Modal - ปรับปรุงกึ่งกลางเด่นสายตาเสมอ) -->
   <div id="categoryCalendarModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-2xl transition-colors">
+    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-2xl transition-colors m-auto max-h-[90vh] overflow-y-auto scrollbar-hide">
       <!-- ส่วนหัวของโมดอลแสดงชื่อหมวดหมู่ที่เลือก -->
       <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-gray-800">
         <div class="flex items-center gap-2">
@@ -431,9 +431,9 @@
     </div>
   </div>
 
-  <!-- หน้าต่างแก้วป็อปอัปยืนยันการลบข้อมูล (Custom Modal) -->
-  <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs text-center space-y-4 shadow-xl">
+  <!-- หน้าต่างแก้วป็อปอัปยืนยันการลบข้อมูล (Custom Modal - ปรับปรุงกึ่งกลางเด่นสายตาเสมอ) -->
+  <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs text-center space-y-4 shadow-xl m-auto max-h-[90vh] overflow-y-auto scrollbar-hide">
       <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/30 rounded-2xl flex items-center justify-center mx-auto text-rose-500">
         <i data-lucide="trash-2" class="w-6 h-6"></i>
       </div>
@@ -592,7 +592,8 @@
 
     function toggleAddCategoryModal(show) {
       const modal = document.getElementById('addCategoryModal');
-      modal.style.display = show ? 'flex' : 'none';
+      modal.classList.toggle('hidden', !show);
+      modal.classList.toggle('flex', show);
       if(show) {
         document.getElementById('catModalMode').value = "add";
         updateCategoryModalMode();
@@ -1014,6 +1015,7 @@
     function toggleCategoryCalendarModal(show) {
       const modal = document.getElementById('categoryCalendarModal');
       modal.classList.toggle('hidden', !show);
+      modal.classList.toggle('flex', show);
     }
 
     function openCategoryCalendar(categoryName) {
@@ -1206,7 +1208,7 @@
       if(tab === 'stats') renderStatsView();
     }
 
-    // แปลงรูปแบบวันที่ปกติเป็นรูปแบบไทย
+    //  แปลงรูปแบบวันที่ปกติเป็นรูปแบบไทย
     function formatDateThai(dateStr) {
       if (!dateStr) return "";
       const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
@@ -1341,6 +1343,7 @@
     function toggleDeleteModal(show) {
       const modal = document.getElementById('deleteModal');
       modal.classList.toggle('hidden', !show);
+      modal.classList.toggle('flex', show);
       if(show) {
         document.getElementById('confirmDeleteBtn').onclick = executeDeleteExpense;
       }
