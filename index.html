@@ -1,0 +1,105 @@
+<script>
+    // กำหนด URL ของ Google Web App ที่คุณได้ Deploy ล่าสุด
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzKXIyaK8MEW1VPJaE0f6kOlvQL8KIU0788xwaGVuJLyP0hFLnaaydUFF9-bXChxJpM/exec";
+
+    // อัปเดตฟังก์ชันเชื่อมโยงดึงข้อมูลกับ GAS ด้วยวิธี Fetch API
+    function loadDataFromGAS() {
+      fetch(`${WEB_APP_URL}?action=getExpenses`)
+        .then(response => response.json())
+        .then(data => {
+          updateUI(data);
+        })
+        .catch(error => {
+          const loadingDiv = document.getElementById('loadingIndicator');
+          loadingDiv.innerHTML = `
+            <i data-lucide="alert-circle" class="w-8 h-8 text-red-500 mx-auto mb-2 animate-bounce"></i>
+            <p class="text-xs text-red-400 font-bold">เชื่อมต่อสารสนเทศบนคลาวด์ไม่สำเร็จ</p>
+            <p class="text-[10px] text-gray-500 mt-1">${error.message}</p>
+          `;
+          lucide.createIcons();
+          console.error("Error loading data:", error);
+        });
+    }
+
+    // ฟังก์ชันรันการลบข้อมูลผ่านการยิง Fetch POST
+    function executeDelete() {
+      if (!deleteTargetId) return;
+      
+      document.getElementById('confirmDeleteModal').classList.add('hidden');
+      document.getElementById('loadingIndicator').classList.remove('hidden');
+      document.getElementById('historySection').classList.add('hidden');
+      
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors", // ใช้ no-cors เนื่องจากเป็นข้อจำกัดการยิง Redirect ข้ามโดเมนของ Google
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: 'deleteExpense', data: { id: deleteTargetId } })
+      })
+      .then(() => {
+        // เนื่องจากโหมด no-cors จะอ่าน Response ตรงๆ ไม่ได้ ให้ตั้งเวลาหน่วงไว้ดึงข้อมูลชุดใหม่เข้าทดแทน
+        setTimeout(() => {
+          loadDataFromGAS();
+          showToast('ส่งคำขอลบข้อมูลไปยังคลาวด์เรียบร้อยแล้ว', 'trash-2');
+        }, 1500);
+      })
+      .catch(error => {
+        showToast('เกิดข้อผิดพลาดในการส่งข้อมูล: ' + error.message, 'alert-circle');
+        loadDataFromGAS();
+      });
+      
+      deleteTargetId = null;
+    }
+
+    // ฟังก์ชันจัดการส่งฟอร์มข้อมูลเพิ่มและแก้ไขผ่านการยิง Fetch POST
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<div class="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin border-white"></div> กำลังเชื่อมต่อ...';
+      btn.disabled = true;
+
+      const data = {
+        date: document.getElementById('dateInput').value,
+        category: document.getElementById('categoryInput').value,
+        description: document.getElementById('descInput').value,
+        amount: document.getElementById('amountInput').value
+      };
+
+      let actionType = 'addExpense';
+      if (editingId) {
+        data.id = editingId;
+        actionType = 'updateExpense';
+      }
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: actionType, data: data })
+      })
+      .then(() => {
+        setTimeout(() => {
+          loadDataFromGAS();
+          if (editingId) {
+            cancelEdit();
+            showToast('อัปเดตการบันทึกสำเร็จ', 'check-circle');
+          } else {
+            document.getElementById('descInput').value = '';
+            document.getElementById('amountInput').value = '';
+            showToast('บันทึกลงคลาวด์เรียบร้อย', 'check-circle');
+          }
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }, 1500);
+      })
+      .catch(err => {
+        showToast('การส่งข้อมูลล้มเหลว: ' + err.message, 'alert-circle');
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      });
+    }
+
+    // [หมายเหตุ] สำหรับฟังก์ชันอื่นๆ ทั้งหมดในไฟล์เดิมของคุณ เช่น syncSystemTheme(),
+    // renderCategoryDropdowns(), renderChart(), switchTab() และระบบการคำนวณกราฟ
+    // สามารถคงรักษาชุดคำสั่งเดิมไว้ได้โดยไม่ต้องแก้ไขอะไรเลยครับ 
+  </script>
