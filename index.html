@@ -119,23 +119,29 @@
         </div>
 
         <form id="expenseForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+          <!-- แถววันที่และเวลาคู่กันเพื่อความสมดุลของการบันทึกตรงกับ Google Sheet -->
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">วันที่บันทึก</label>
-              <input type="date" id="dateInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
+              <input type="date" id="dateInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
             </div>
             <div>
-              <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">หมวดหมู่</label>
-              <div class="flex gap-2">
-                <!-- Dropdown หมวดหมู่ ถูกสร้างผ่าน JS โดยจะแยก 'อื่นๆ' ให้อยู่ล่างสุดเสมอ -->
-                <select id="categoryInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-[11px] font-bold outline-none focus:border-emerald-500 transition-all">
-                  <!-- JS จะเติมข้อมูลอัตโนมัติ -->
-                </select>
-                <!-- ปุ่มเพิ่มหมวดหมู่ -->
-                <button type="button" onclick="toggleAddCategoryModal(true)" class="bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-gray-700 w-11 flex-shrink-0 rounded-xl flex items-center justify-center transition-colors">
-                  <i data-lucide="plus" class="w-4 h-4"></i>
-                </button>
-              </div>
+              <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">เวลา</label>
+              <input type="time" id="timeInput" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">หมวดหมู่</label>
+            <div class="flex gap-2">
+              <!-- Dropdown หมวดหมู่ ถูกสร้างผ่าน JS โดยจะแยก 'อื่นๆ' ให้อยู่ล่างสุดเสมอ -->
+              <select id="categoryInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-3 text-[11px] font-bold outline-none focus:border-emerald-500 transition-all">
+                <!-- JS จะเติมข้อมูลอัตโนมัติ -->
+              </select>
+              <!-- ปุ่มเปิดหน้าต่างจัดการหมวดหมู่ (Edit / Add) -->
+              <button type="button" onclick="toggleAddCategoryModal(true)" class="bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-gray-700 w-11 flex-shrink-0 rounded-xl flex items-center justify-center transition-colors">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+              </button>
             </div>
           </div>
 
@@ -278,11 +284,11 @@
 
   </main>
 
-  <!-- หน้าต่างเพิ่มหมวดหมู่ (Custom Add Category Modal) -->
+  <!-- หน้าต่างจัดการและเพิ่มหมวดหมู่ (Custom Add & Manage Category Modal) -->
   <div id="addCategoryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs space-y-4 shadow-xl">
+    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-sm space-y-4 shadow-xl">
       <div class="flex items-center justify-between mb-2">
-        <h4 class="text-sm font-extrabold flex items-center gap-2">
+        <h4 id="categoryModalTitle" class="text-sm font-extrabold flex items-center gap-2">
           <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-500"></i> สร้างหมวดหมู่ใหม่
         </h4>
         <button onclick="toggleAddCategoryModal(false)" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-400">
@@ -290,37 +296,52 @@
         </button>
       </div>
 
-      <div>
-        <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">ชื่อหมวดหมู่</label>
-        <input type="text" id="newCatName" placeholder="เช่น ค่ากาแฟ, ช้อปปิ้ง" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
+      <!-- ฟอร์มสร้าง/แก้ไขหมวดหมู่ -->
+      <div class="space-y-3 bg-slate-50 dark:bg-[#1A1C24]/50 p-3.5 rounded-2xl border border-slate-100 dark:border-gray-800">
+        <div>
+          <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">ชื่อหมวดหมู่</label>
+          <input type="text" id="newCatName" placeholder="เช่น ค่ากาแฟ, ช้อปปิ้ง" class="w-full bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">ไอคอน (Emoji)</label>
+            <select id="newCatEmoji" class="w-full bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-2 text-base font-bold outline-none focus:border-emerald-500 transition-all">
+              <option value="☕">☕ กาแฟ</option>
+              <option value="🛍️">🛍️ ช้อปปิ้ง</option>
+              <option value="🏠">🏠 บ้าน</option>
+              <option value="📚">📚 การศึกษา</option>
+              <option value="🎁">🎁 ของขวัญ</option>
+              <option value="🎮">🎮 เกมส์</option>
+              <option value="✈️">✈️ ท่องเที่ยว</option>
+              <option value="🐶">🐶 สัตว์เลี้ยง</option>
+              <option value="📦">📦 พัสดุ</option>
+              <option value="💸">💸 หนี้สิน</option>
+              <option value="🏷️">🏷️ ป้ายกำกับ</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">สีประจำหมวด</label>
+            <input type="color" id="newCatColor" value="#10b981" class="w-full h-10 bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl p-1 outline-none cursor-pointer">
+          </div>
+        </div>
+
+        <button id="saveCategoryBtn" onclick="saveNewCategory()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-md mt-1 transition-all">
+          ยืนยันการสร้าง
+        </button>
+        <button id="cancelCategoryEditBtn" onclick="cancelCategoryEdit()" class="hidden w-full bg-slate-200 dark:bg-gray-800 text-slate-600 dark:text-gray-400 font-bold text-[11px] py-2 px-4 rounded-xl transition-all">
+          ยกเลิกการแก้ไข
+        </button>
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">ไอคอน (Emoji)</label>
-          <select id="newCatEmoji" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-base font-bold outline-none focus:border-emerald-500 transition-all">
-            <option value="☕">☕ กาแฟ</option>
-            <option value="🛍️">🛍️ ช้อปปิ้ง</option>
-            <option value="🏠">🏠 บ้าน</option>
-            <option value="📚">📚 การศึกษา</option>
-            <option value="🎁">🎁 ของขวัญ</option>
-            <option value="🎮">🎮 เกมส์</option>
-            <option value="✈️">✈️ ท่องเที่ยว</option>
-            <option value="🐶">🐶 สัตว์เลี้ยง</option>
-            <option value="📦">📦 พัสดุ</option>
-            <option value="💸">💸 หนี้สิน</option>
-            <option value="🏷️">🏷️ ป้ายกำกับ</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">สีประจำหมวด</label>
-          <input type="color" id="newCatColor" value="#10b981" class="w-full h-12 bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl p-1 outline-none cursor-pointer">
+      <!-- ส่วนรายการหมวดหมู่สะสมเพื่อให้สามารถแก้ไขหรือลบได้สดๆ -->
+      <div class="border-t border-slate-100 dark:border-gray-800/80 pt-3">
+        <h5 class="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-wider mb-2">หมวดหมู่ทั้งหมดในระบบ</h5>
+        <div id="manageCategoriesList" class="max-h-44 overflow-y-auto space-y-1.5 pr-1 scrollbar-hide">
+          <!-- โหนดรายการหมวดหมู่จะถูกเติมผ่าน JavaScript -->
         </div>
       </div>
 
-      <button onclick="saveNewCategory()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-3.5 px-4 rounded-xl shadow-md mt-2">
-        ยืนยันการสร้าง
-      </button>
     </div>
   </div>
 
@@ -348,9 +369,9 @@
   <script>
     const DEMO_KEY = "expense_tracker_demo_data";
     const MOCK_EXPENSES = [
-      { id: "1", date: new Date().toISOString().split('T')[0], category: "อาหาร", description: "อาหารมื้อกลางวัน", amount: 120 },
-      { id: "2", date: new Date().toISOString().split('T')[0], category: "เดินทาง", description: "ค่าน้ำมันรถยนต์สำหรับการทำงาน", amount: 500 },
-      { id: "3", date: new Date().toISOString().split('T')[0], category: "ค่าบริการ", description: "บิลค่าน้ำและไฟฟ้าสำนักงาน", amount: 1450.50 }
+      { id: "1", date: new Date().toISOString().split('T')[0], time: "12:00", category: "อาหาร", description: "อาหารมื้อกลางวัน", amount: 120 },
+      { id: "2", date: new Date().toISOString().split('T')[0], time: "14:15", category: "เดินทาง", description: "ค่าน้ำมันรถยนต์สำหรับการทำงาน", amount: 500 },
+      { id: "3", date: new Date().toISOString().split('T')[0], time: "18:30", category: "ค่าบริการ", description: "บิลค่าน้ำและไฟฟ้าสำนักงาน", amount: 1450.50 }
     ];
 
     // หมวดหมู่ดั้งเดิมพื้นฐาน (สีถูกอิงตามระบบ HEX เป็นหลักในการไล่ระดับ Donut และ List)
@@ -370,6 +391,7 @@
     let editingId = null;
     let deleteIdTarget = null;
     let selectedMonth = ""; // เก็บค่าเดือนที่เลือกในแท็บคลังประวัติ (รูปแบบ YYYY-MM)
+    let categoryEditingKey = null; // คีย์สำหรับการแก้ไขหมวดหมู่ที่สร้างขึ้นเอง
 
     // โหลดหมวดหมู่จาก localStorage อย่างถาวร
     let customCategories = JSON.parse(localStorage.getItem('expense_custom_categories')) || {};
@@ -386,6 +408,12 @@
       
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('dateInput').value = today;
+      
+      // ตั้งเวลาปัจจุบัน
+      const now = new Date();
+      const currentHours = String(now.getHours()).padStart(2, '0');
+      const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('timeInput').value = `${currentHours}:${currentMinutes}`;
       
       lucide.createIcons();
     });
@@ -469,10 +497,94 @@
       const modal = document.getElementById('addCategoryModal');
       modal.style.display = show ? 'flex' : 'none';
       if(show) {
-        document.getElementById('newCatName').value = "";
+        cancelCategoryEdit();
+        renderManageCategoriesList();
       }
     }
 
+    // เรนเดอร์รายการหมวดหมู่ภายใน Modal เพื่อการแก้ไขและลบ
+    function renderManageCategoriesList() {
+      const container = document.getElementById('manageCategoriesList');
+      if(!container) return;
+      
+      let html = '';
+      
+      // 1. หมวดหมู่ระบบ (อ่านได้อย่างเดียวเพื่อความเสถียร)
+      Object.keys(DEFAULT_CATEGORIES).forEach(k => {
+        const item = DEFAULT_CATEGORIES[k];
+        html += `
+          <div class="flex items-center justify-between p-2.5 bg-slate-100 dark:bg-gray-800 rounded-xl text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-base">${item.emoji}</span>
+              <span class="font-bold text-slate-700 dark:text-gray-300">${k}</span>
+              <span class="text-[8px] bg-slate-200 dark:bg-gray-700 font-extrabold text-slate-500 dark:text-gray-400 px-1.5 py-0.5 rounded">ระบบ</span>
+            </div>
+            <!-- ไม่แสดงปุ่มลบหรือแก้ไขสำหรับหมวดหมู่หลักของระบบเพื่อความเสถียรสูงสุด -->
+          </div>
+        `;
+      });
+      
+      // 2. หมวดหมู่ที่สร้างขึ้นมาเอง (สามารถแก้ไขและลบได้สด ๆ)
+      Object.keys(customCategories).forEach(k => {
+        const item = customCategories[k];
+        html += `
+          <div class="flex items-center justify-between p-2.5 bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl text-xs shadow-sm">
+            <div class="flex items-center gap-2">
+              <span class="text-base">${item.emoji}</span>
+              <span class="font-bold text-slate-700 dark:text-gray-300">${k}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="startEditCategory('${k}')" class="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all">
+                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+              </button>
+              <button type="button" onclick="deleteCategory('${k}')" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    // เริ่มโหมดแก้ไขหมวดหมู่
+    function startEditCategory(key) {
+      const item = customCategories[key];
+      if(!item) return;
+      
+      categoryEditingKey = key;
+      
+      document.getElementById('categoryModalTitle').innerHTML = `<i data-lucide="edit-2" class="w-4 h-4 text-blue-500"></i> แก้ไขหมวดหมู่`;
+      document.getElementById('newCatName').value = key;
+      document.getElementById('newCatEmoji').value = item.emoji;
+      document.getElementById('newCatColor').value = item.hex;
+      
+      document.getElementById('saveCategoryBtn').innerText = "บันทึกการแก้ไข";
+      document.getElementById('saveCategoryBtn').className = "w-full bg-blue-500 hover:bg-blue-600 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-md mt-1 transition-all";
+      document.getElementById('cancelCategoryEditBtn').classList.remove('hidden');
+      
+      lucide.createIcons();
+    }
+
+    // ยกเลิกการแก้ไขหมวดหมู่
+    function cancelCategoryEdit() {
+      categoryEditingKey = null;
+      
+      document.getElementById('categoryModalTitle').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 text-emerald-500"></i> สร้างหมวดหมู่ใหม่`;
+      document.getElementById('newCatName').value = "";
+      document.getElementById('newCatEmoji').value = "☕";
+      document.getElementById('newCatColor').value = "#10b981";
+      
+      document.getElementById('saveCategoryBtn').innerText = "ยืนยันการสร้าง";
+      document.getElementById('saveCategoryBtn').className = "w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-md mt-1 transition-all";
+      document.getElementById('cancelCategoryEditBtn').classList.add('hidden');
+      
+      lucide.createIcons();
+    }
+
+    // บันทึกหรือสร้างหมวดหมู่ใหม่
     function saveNewCategory() {
       const name = document.getElementById('newCatName').value.trim();
       const emoji = document.getElementById('newCatEmoji').value;
@@ -482,25 +594,84 @@
         showToast("กรุณากรอกชื่อหมวดหมู่", "alert-circle");
         return;
       }
-      if (CATEGORY_STYLES[name]) {
-        showToast("มีหมวดหมู่นี้อยู่แล้ว", "alert-circle");
+      
+      if (DEFAULT_CATEGORIES[name]) {
+        showToast("ไม่สามารถใช้ชื่อซ้ำกับหมวดหมู่หลักของระบบได้", "alert-circle");
         return;
       }
 
-      // ทำการสร้างและบันทึกใน LocalStorage อย่างถาวรไม่หายเมื่อรีเฟรช
-      customCategories[name] = { emoji: emoji, color: "from-slate-200 to-slate-300", hex: hex };
+      if (categoryEditingKey) {
+        // กรณีแก้ไขหมวดหมู่เดิม
+        if (categoryEditingKey !== name && customCategories[name]) {
+          showToast("ชื่อหมวดหมู่นี้มีอยู่แล้ว", "alert-circle");
+          return;
+        }
+        
+        // ถ้าคีย์เปลี่ยน ลบอันเดิมแล้วใส่คีย์ใหม่
+        if (categoryEditingKey !== name) {
+          delete customCategories[categoryEditingKey];
+          
+          // อัปเดตรายการรายจ่ายเดิมที่บันทึกไว้ให้แมปกับหมวดหมู่ชื่อใหม่
+          expenses.forEach(ex => {
+            if(ex.category === categoryEditingKey) {
+              ex.category = name;
+            }
+          });
+          if(!isCloudMode) {
+            localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
+          }
+        }
+        
+        customCategories[name] = { emoji: emoji, color: "from-slate-200 to-slate-300", hex: hex };
+        showToast("อัปเดตข้อมูลหมวดหมู่เรียบร้อย", "check-circle");
+        
+      } else {
+        // กรณีเพิ่มหมวดหมู่ใหม่
+        if (customCategories[name]) {
+          showToast("มีหมวดหมู่นี้อยู่แล้ว", "alert-circle");
+          return;
+        }
+        customCategories[name] = { emoji: emoji, color: "from-slate-200 to-slate-300", hex: hex };
+        showToast("สร้างหมวดหมู่ใหม่สำเร็จ!", "check-circle");
+      }
+
+      // บันทึกค่าถาวรลง localStorage
       CATEGORY_STYLES = { ...DEFAULT_CATEGORIES, ...customCategories };
       localStorage.setItem('expense_custom_categories', JSON.stringify(customCategories));
       
       populateCategorySelects();
-      toggleAddCategoryModal(false);
-      
-      document.getElementById('categoryInput').value = name;
-      showToast("สร้างหมวดหมู่ใหม่สำเร็จ!", "check-circle");
-      renderStatsView(); // เรียกอัปเดตสถิติทันทีเผื่อมีการใช้งานข้อมูลใหม่
+      cancelCategoryEdit();
+      renderManageCategoriesList();
+      renderDataAndStats();
     }
 
-    // ================= ระบบดึงข้อมูลคลาวด์ =================
+    // ลบหมวดหมู่
+    function deleteCategory(key) {
+      delete customCategories[key];
+      
+      // ปรับปรุงรายการที่ผูกกับหมวดหมู่นั้นให้ไปอยู่หมวด "อื่นๆ" แทน เพื่อกันข้อมูลสูญหาย
+      expenses.forEach(ex => {
+        if (ex.category === key) {
+          ex.category = "อื่นๆ";
+        }
+      });
+      
+      if(!isCloudMode) {
+        localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
+      }
+
+      CATEGORY_STYLES = { ...DEFAULT_CATEGORIES, ...customCategories };
+      localStorage.setItem('expense_custom_categories', JSON.stringify(customCategories));
+      
+      populateCategorySelects();
+      cancelCategoryEdit();
+      renderManageCategoriesList();
+      renderDataAndStats();
+      
+      showToast(`ลบหมวดหมู่ "${key}" เรียบร้อย`, "trash");
+    }
+
+    // ================= ระบบดึงข้อมูลคลาวด์ พร้อมวิเคราะห์แบบ Robust =================
     function loadLocalExpenses() {
       const localData = localStorage.getItem(DEMO_KEY);
       if (localData) {
@@ -526,7 +697,72 @@
         return res.json();
       })
       .then(data => {
-        expenses = Array.isArray(data) ? data : [];
+        // ประมวลผลและแปลงข้อมูลอย่างประณีต เพื่อรองรับการแก้ไขข้อมูลโดยตรงใน Google Sheets
+        expenses = Array.isArray(data) ? data.map(item => {
+          let rawDate = item.date || "";
+          let parsedDate = "";
+          
+          // ตัวแปลงรูปแบบวันที่แบบยืดหยุ่นสูง (Robust Date Parser)
+          if (typeof rawDate === 'string') {
+            if (rawDate.includes('T')) {
+              parsedDate = rawDate.split('T')[0];
+            } else if (rawDate.includes('/')) {
+              // รูปแบบ DD/MM/YYYY หรือ YYYY/MM/DD
+              const parts = rawDate.split('/');
+              if (parts.length === 3) {
+                if (parts[2].length === 4) {
+                  parsedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                } else if (parts[0].length === 4) {
+                  parsedDate = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+                }
+              }
+            } else {
+              parsedDate = rawDate;
+            }
+          } else {
+            try {
+              const d = new Date(rawDate);
+              if (!isNaN(d.getTime())) {
+                parsedDate = d.toISOString().split('T')[0];
+              }
+            } catch(e) {}
+          }
+          
+          if (!parsedDate) {
+            parsedDate = new Date().toISOString().split('T')[0];
+          }
+
+          // ตัววิเคราะห์และแปลงเวลาแบบยืดหยุ่นสูง (Robust Time Parser)
+          let rawTime = item.time || "";
+          let parsedTime = "";
+          if (typeof rawTime === 'string') {
+            if (rawTime.includes('T')) {
+              const tPart = rawTime.split('T')[1];
+              if (tPart) parsedTime = tPart.substring(0, 5);
+            } else if (rawTime.includes(':')) {
+              const tParts = rawTime.split(':');
+              parsedTime = `${tParts[0].padStart(2, '0')}:${tParts[1].padStart(2, '0')}`;
+            } else {
+              parsedTime = rawTime.substring(0, 5);
+            }
+          } else if (typeof rawTime === 'number') {
+            // กรณี Excel/Sheets คืนเวลาเป็นทศนิยมของวัน
+            const totalMinutes = Math.round(rawTime * 24 * 60);
+            const hrs = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+            const mins = String(totalMinutes % 60).padStart(2, '0');
+            parsedTime = `${hrs}:${mins}`;
+          }
+
+          return {
+            id: String(item.id || ''),
+            date: parsedDate,
+            time: parsedTime,
+            category: item.category || "อื่นๆ",
+            description: item.description || "รายการเบิกจ่าย",
+            amount: parseFloat(item.amount) || 0
+          };
+        }) : [];
+
         renderDataAndStats();
         if(addLoader) addLoader.classList.add('hidden');
         showToast("ซิงก์ข้อมูลคลาวด์เรียบร้อย", "cloud-lightning");
@@ -579,7 +815,15 @@
       const container = document.getElementById('recentExpensesContainer');
       if(!container) return;
       
-      const sorted = [...expenses].sort((a,b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+      // เรียงจากวันที่ -> เวลา -> ID
+      const sorted = [...expenses].sort((a,b) => {
+        const dateCompare = b.date.localeCompare(a.date);
+        if (dateCompare !== 0) return dateCompare;
+        const timeCompare = (b.time || "").localeCompare(a.time || "");
+        if (timeCompare !== 0) return timeCompare;
+        return b.id.localeCompare(a.id);
+      });
+      
       const top5 = sorted.slice(0, 5);
       
       if(top5.length === 0) {
@@ -594,6 +838,7 @@
     function generateExpenseRowHtml(e) {
       const style = CATEGORY_STYLES[e.category] || CATEGORY_STYLES["อื่นๆ"];
       const amt = parseFloat(e.amount) || 0;
+      const timeDisplay = e.time ? ` · ⏰ ${e.time}` : '';
       
       return `
         <div class="bg-white dark:bg-[#13151C] border border-slate-100 dark:border-gray-800/40 p-3.5 rounded-2xl flex items-center justify-between shadow-sm hover:scale-[1.005] transition-all group">
@@ -603,7 +848,7 @@
             </div>
             <div class="min-w-0">
               <p class="text-xs font-black text-slate-800 dark:text-gray-100 truncate">${e.description}</p>
-              <p class="text-[10px] text-slate-400 dark:text-gray-500 font-bold mt-0.5">${formatDateThai(e.date)} · <span style="color: ${style.hex}">${e.category}</span></p>
+              <p class="text-[10px] text-slate-400 dark:text-gray-500 font-bold mt-0.5">${formatDateThai(e.date)}${timeDisplay} · <span style="color: ${style.hex}">${e.category}</span></p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
@@ -686,7 +931,7 @@
         return;
       }
       
-      const sorted = items.sort((a,b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+      const sorted = items.sort((a,b) => b.date.localeCompare(a.date) || (b.time || "").localeCompare(a.time || "") || b.id.localeCompare(a.id));
       container.innerHTML = sorted.map(e => generateExpenseRowHtml(e)).join('');
       lucide.createIcons();
     }
@@ -820,6 +1065,7 @@
       e.preventDefault();
       
       const date = document.getElementById('dateInput').value;
+      const time = document.getElementById('timeInput').value;
       const category = document.getElementById('categoryInput').value;
       const description = document.getElementById('descInput').value.trim();
       const amount = parseFloat(document.getElementById('amountInput').value) || 0;
@@ -833,7 +1079,7 @@
         // โหมดอัปเดตแก้ไขรายการเดิม
         const targetIndex = expenses.findIndex(ex => ex.id === editingId);
         if(targetIndex !== -1) {
-          expenses[targetIndex] = { ...expenses[targetIndex], date, category, description, amount };
+          expenses[targetIndex] = { ...expenses[targetIndex], date, time, category, description, amount };
         }
         
         if(isCloudMode) {
@@ -841,7 +1087,7 @@
           fetch(`${webAppUrl}?action=updateExpense`, {
             method: 'POST',
             mode: 'cors',
-            body: JSON.stringify({ id: editingId, date, category, description, amount })
+            body: JSON.stringify({ id: editingId, date, time, category, description, amount })
           })
           .then(res => res.json())
           .then(() => {
@@ -862,7 +1108,7 @@
       } else {
         // โหมดการสร้างข้อมูลบันทึกใหม่
         const newId = Date.now().toString();
-        const newExpense = { id: newId, date, category, description, amount };
+        const newExpense = { id: newId, date, time, category, description, amount };
         
         expenses.unshift(newExpense);
         
@@ -895,6 +1141,9 @@
       document.getElementById('descInput').value = "";
       document.getElementById('amountInput').value = "";
       document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+      
+      const now = new Date();
+      document.getElementById('timeInput').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }
 
     function startEditMode(id) {
@@ -908,6 +1157,7 @@
       document.getElementById('submitBtn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> อัปเดตข้อมูลที่แก้ไข`;
       
       document.getElementById('dateInput').value = item.date;
+      document.getElementById('timeInput').value = item.time || "";
       document.getElementById('categoryInput').value = item.category;
       document.getElementById('descInput').value = item.description;
       document.getElementById('amountInput').value = item.amount;
@@ -992,3 +1242,5 @@
   </script>
 </body>
 </html>
+```
+eof
