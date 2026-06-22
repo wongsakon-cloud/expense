@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>แอปบันทึกและเบิกจ่ายเงิน (Cloud Sync & Stats Upgrade)</title>
+  <title>แอปบันทึกและเบิกจ่ายเงิน (Cloud Sync)</title>
   
   <!-- นำเข้าทรัพยากรการแสดงผลที่จำเป็นเพื่อความเสถียรเมื่อรันบน GitHub -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -221,67 +221,18 @@
       </div>
     </div>
 
-    <!-- ส่วนที่ 3: แท็บแผนภูมิสถิติรายจ่าย (ปรับปรุงใหม่: คัดเลือกช่วงเวลา และแยกประเภทได้) -->
-    <div id="content-stats" class="hidden space-y-4">
-      
-      <!-- ส่วนแผงควบคุมการกรองสถิติ (Statistics Filters) -->
-      <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm space-y-4">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-gray-500 flex items-center gap-2">
-            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i> ตั้งค่าการวิเคราะห์สถิติ
-          </h3>
-          <button onclick="resetStatsFilters()" class="text-[10px] text-emerald-500 hover:underline font-bold flex items-center gap-1">
-            <i data-lucide="rotate-ccw" class="w-3 h-3"></i> รีเซ็ตตัวกรอง
-          </button>
-        </div>
-
-        <!-- ตัวย่นระยะเวลาด่วน (Quick Date Chips) -->
-        <div class="flex gap-1.5 overflow-x-auto scrollbar-hide py-0.5">
-          <button onclick="setStatsQuickRange('current_month')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-900/40 whitespace-nowrap">
-            เดือนปัจจุบัน
-          </button>
-          <button onclick="setStatsQuickRange('last_7_days')" class="px-3 py-1.5 bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 text-[10px] font-bold rounded-lg whitespace-nowrap">
-            7 วันล่าสุด
-          </button>
-          <button onclick="setStatsQuickRange('last_30_days')" class="px-3 py-1.5 bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 text-[10px] font-bold rounded-lg whitespace-nowrap">
-            30 วันล่าสุด
-          </button>
-          <button onclick="setStatsQuickRange('all')" class="px-3 py-1.5 bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 text-[10px] font-bold rounded-lg whitespace-nowrap">
-            ดูทุกยอดทั้งหมด
-          </button>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 pt-1">
-          <div>
-            <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">เริ่มต้น</label>
-            <input type="date" id="statsStartDate" onchange="onStatsFilterChange()" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
-          </div>
-          <div>
-            <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">สิ้นสุด</label>
-            <input type="date" id="statsEndDate" onchange="onStatsFilterChange()" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
-          </div>
-        </div>
-
-        <div>
-          <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">กรองเฉพาะหมวดหมู่</label>
-          <select id="statsCategorySelect" onchange="onStatsFilterChange()" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
-            <!-- จะนำเข้าข้อมูลอัตโนมัติผ่าน JavaScript -->
-          </select>
-        </div>
-      </section>
-
-      <!-- บอร์ดวิเคราะห์และแสดงกราฟสัดส่วน -->
+    <!-- ส่วนที่ 3: แท็บแผนภูมิสถิติรายจ่าย -->
+    <div id="content-stats" class="hidden space-y-6">
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm">
-        <h3 class="text-sm font-extrabold flex items-center gap-2 mb-2">
-          <span class="w-2 h-4 bg-purple-500 rounded"></span> สัดส่วนรายจ่ายตามตัวกรอง
+        <h3 class="text-sm font-extrabold flex items-center gap-2 mb-4">
+          <span class="w-2 h-4 bg-purple-500 rounded"></span> สัดส่วนรายจ่ายตามหมวดหมู่
         </h3>
-        <p id="statsPeriodLabel" class="text-[10px] text-slate-400 dark:text-gray-500 font-bold mb-4">แสดงข้อมูลช่วงเวลา: -</p>
 
         <!-- กราฟวงกลมจำลองด้วย SVG & conic-gradient -->
         <div class="flex flex-col items-center justify-center py-6">
           <div id="chartDonut" class="w-44 h-44 rounded-full shadow-inner relative flex items-center justify-center transition-all duration-500" style="background: conic-gradient(#e2e8f0 0% 100%)">
             <div class="w-32 h-32 bg-white dark:bg-[#13151C] rounded-full flex flex-col items-center justify-center shadow-md">
-              <span class="text-[10px] font-bold text-slate-400 uppercase">ยอดรวมช่วงเวลาที่เลือก</span>
+              <span class="text-[10px] font-bold text-slate-400 uppercase">สัดส่วนรวมทั้งหมด</span>
               <span id="chartCenterSum" class="text-base font-black text-slate-800 dark:text-white mt-0.5">฿0.00</span>
             </div>
           </div>
@@ -384,7 +335,7 @@
     // ตัวแปรส่วนกลาง
     let expenses = [];
     let isCloudMode = true; 
-    let webAppUrl = "https://script.google.com/macros/s/AKfycbzdrGqR8p1bhVuyLbKdYuPMYAvL0cRe7NZ5bcyqsXO2rtQGY3gZO0SU8RUJZ7P-T5Wa/exec"; 
+    let webAppUrl = "https://script.google.com/macros/s/AKfycbxbSjAmcYtjeZHsZsKjC1DVQhsvfDxq76oqbZAeC1Bd7FBPQxRhP3zbNZTeAPnkKTNA/exec"; 
     let editingId = null;
     let deleteIdTarget = null;
     let selectedMonth = ""; // เก็บค่าเดือนที่เลือกในแท็บคลังประวัติ (รูปแบบ YYYY-MM)
@@ -396,7 +347,6 @@
     // ระบบทำงานเมื่อเริ่มต้น (DOMContentLoaded)
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
-      initStatsFilters(); // กำหนดค่าเริ่มต้นช่วงเวลาในหน้าสถิติเป็นเดือนปัจจุบัน
       populateCategorySelects(); // เรนเดอร์ Dropdown ใหม่ทุกครั้งที่มีการอัปเดต
       
       updateStatusBadge(true, "เชื่อมคลาวด์สด");
@@ -443,75 +393,13 @@
       }
     }
 
-    // ================= ระบบเริ่มต้นตัวกรองสำหรับหน้าสถิติ =================
-    function initStatsFilters() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      
-      // วันแรกของเดือนปัจจุบัน
-      const firstDay = `${year}-${month}-01`;
-      
-      // วันสุดท้ายของเดือนปัจจุบัน
-      const lastDayVal = new Date(year, now.getMonth() + 1, 0).getDate();
-      const lastDay = `${year}-${month}-${String(lastDayVal).padStart(2, '0')}`;
-      
-      document.getElementById('statsStartDate').value = firstDay;
-      document.getElementById('statsEndDate').value = lastDay;
-    }
-
-    // ตัวเลือกกรองแบบปุ่มด่วน (Quick date filters)
-    function setStatsQuickRange(rangeType) {
-      const now = new Date();
-      let startStr = "";
-      let endStr = now.toISOString().split('T')[0];
-
-      if (rangeType === 'current_month') {
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        startStr = `${year}-${month}-01`;
-        const lastDayVal = new Date(year, now.getMonth() + 1, 0).getDate();
-        endStr = `${year}-${month}-${String(lastDayVal).padStart(2, '0')}`;
-      } else if (rangeType === 'last_7_days') {
-        const priorDate = new Date();
-        priorDate.setDate(now.getDate() - 7);
-        startStr = priorDate.toISOString().split('T')[0];
-      } else if (rangeType === 'last_30_days') {
-        const priorDate = new Date();
-        priorDate.setDate(now.getDate() - 30);
-        startStr = priorDate.toISOString().split('T')[0];
-      } else if (rangeType === 'all') {
-        startStr = "2000-01-01"; // ต่ำพอที่จะครอบคลุมข้อมูลทั้งหมด
-        endStr = "2099-12-31"; // สูงพอที่จะครอบคลุมข้อมูลทั้งหมด
-      }
-
-      document.getElementById('statsStartDate').value = startStr;
-      document.getElementById('statsEndDate').value = endStr;
-      
-      onStatsFilterChange();
-      showToast("ปรับเปลี่ยนขอบเขตช่วงเวลาเรียบร้อย", "calendar");
-    }
-
-    function resetStatsFilters() {
-      initStatsFilters();
-      document.getElementById('statsCategorySelect').value = "ทั้งหมด";
-      onStatsFilterChange();
-      showToast("คืนค่าเริ่มต้นทุกยอดของเดือนปัจจุบันเรียบร้อย", "rotate-ccw");
-    }
-
-    function onStatsFilterChange() {
-      renderCategoryChart(expenses);
-    }
-
     // ================= ระบบจัดการหมวดหมู่ =================
     function populateCategorySelects() {
       const catInput = document.getElementById('categoryInput');
       const filterInput = document.getElementById('filterCategory');
-      const statsCatSelect = document.getElementById('statsCategorySelect');
       
       let optionsHTML = '';
       let filterHTML = '<option value="ทั้งหมด">ทุกหมวดหมู่</option>';
-      let statsCatHTML = '<option value="ทั้งหมด">📊 แสดงทุกหมวดหมู่ร่วมกัน</option>';
 
       // ดึงคีย์ทั้งหมดมา แต่เอา "อื่นๆ" ออกก่อน
       const keys = Object.keys(CATEGORY_STYLES).filter(k => k !== 'อื่นๆ');
@@ -520,18 +408,15 @@
         const str = `<option value="${k}">${CATEGORY_STYLES[k].emoji} ${k}</option>`;
         optionsHTML += str;
         filterHTML += str;
-        statsCatHTML += str;
       });
 
       // ดัน "อื่นๆ" ให้ต่อท้ายสุดเสมอ
       const othersOption = `<option value="อื่นๆ">${CATEGORY_STYLES['อื่นๆ'].emoji} อื่นๆ</option>`;
       optionsHTML += othersOption;
       filterHTML += othersOption;
-      statsCatHTML += othersOption;
 
       if(catInput) catInput.innerHTML = optionsHTML;
       if(filterInput) filterInput.innerHTML = filterHTML;
-      if(statsCatSelect) statsCatSelect.innerHTML = statsCatHTML;
     }
 
     function toggleAddCategoryModal(show) {
@@ -612,7 +497,7 @@
       });
     }
 
-    // ================= ระบบ Render หลัก =================
+    // ================= ระบบ Render =================
     function renderDataAndStats() {
       // หน้า 1: เรนเดอร์ประวัติล่าสุด 5 อันดับแรก
       renderRecentExpenses(expenses.slice(0, 5));
@@ -620,7 +505,7 @@
       renderMonthlyHistoryView();
       // หน้าสรุปยอดหลัก
       updateSummaryCards(expenses);
-      // หน้า 3: แผนภูมิวงกลมแบบตอบสนองต่อตัวกรองวันและประเภท
+      // หน้า 3: แผนภูมิวงกลม
       renderCategoryChart(expenses);
     }
 
@@ -764,50 +649,28 @@
       document.getElementById('totalCountText').innerText = `${items.length} รายการ`;
     }
 
-    // เรนเดอร์แผนภูมิสถิติรายจ่าย แบบปรับปรุงใหม่ให้ตอบรับตามตัวกรองวันและหมวดหมู่
-    function renderCategoryChart(allItems) {
+    // เรนเดอร์สถิติ แถว/คอลัมน์สลับด้าน
+    function renderCategoryChart(items) {
       const donut = document.getElementById('chartDonut');
       const legendContainer = document.getElementById('chartLegendContainer');
       const chartCenterSum = document.getElementById('chartCenterSum');
-      const statsPeriodLabel = document.getElementById('statsPeriodLabel');
 
-      // 1. ดึงช่วงวันที่และหมวดหมู่ที่ใช้กรอง
-      const startDate = document.getElementById('statsStartDate').value;
-      const endDate = document.getElementById('statsEndDate').value;
-      const catFilter = document.getElementById('statsCategorySelect').value;
-
-      // แสดงฉลากช่วงเวลาให้ผู้ใช้เห็นชัดเจน
-      statsPeriodLabel.innerText = `แสดงข้อมูลช่วงเวลา: ${formatDateThai(startDate)} ถึง ${formatDateThai(endDate)}`;
-
-      // 2. คัดกรองข้อมูลดิบตามเกณฑ์
-      const filteredItems = allItems.filter(item => {
-        const matchDate = (!startDate || item.date >= startDate) && (!endDate || item.date <= endDate);
-        const matchCat = (catFilter === "ทั้งหมด") || (item.category === catFilter);
-        return matchDate && matchCat;
-      });
-
-      // 3. จัดการสถานะหากไม่มีผลลัพธ์
-      if (filteredItems.length === 0) {
+      if (items.length === 0) {
         donut.style.background = "conic-gradient(#e2e8f0 0% 100%)";
-        legendContainer.innerHTML = `
-          <div class="bg-slate-50 dark:bg-gray-800/20 rounded-2xl p-6 text-center border border-dashed border-slate-200 dark:border-gray-800">
-            <p class="text-xs text-slate-400 font-bold dark:text-gray-500">ไม่มีข้อมูลธุรกรรมเบิกจ่ายตามเงื่อนไขที่เลือก</p>
-          </div>
-        `;
+        legendContainer.innerHTML = `<p class="text-center text-xs text-slate-400 py-6 font-bold">ไม่มีข้อมูลสถิติ</p>`;
         chartCenterSum.innerText = "฿0.00";
         return;
       }
 
-      // 4. คำนวณสรุปข้อมูล
       const sums = {};
       let grandTotal = 0;
-      filteredItems.forEach(item => {
+      items.forEach(item => {
         const amount = parseFloat(item.amount || 0);
         sums[item.category] = (sums[item.category] || 0) + amount;
         grandTotal += amount;
       });
 
-      chartCenterSum.innerText = `฿${grandTotal.toLocaleString('th-TH', {maximumFractionDigits: 2})}`;
+      chartCenterSum.innerText = `฿${grandTotal.toLocaleString('th-TH', {maximumFractionDigits: 0})}`;
 
       let accumulatedPercent = 0;
       let conicSlices = [];
@@ -843,16 +706,14 @@
         conicSlices.push(`${style.hex || '#64748b'} ${startDeg}% ${accumulatedPercent}%`);
       });
 
-      donut.style.background = conicSlices.length > 1 
-        ? `conic-gradient(${conicSlices.join(', ')})`
-        : `conic-gradient(${conicSlices[0].split(' ')[0]} 0% 100%)`;
+      donut.style.background = `conic-gradient(${conicSlices.join(', ')})`;
 
       legendContainer.innerHTML = `
         <div class="space-y-4">
           <div class="overflow-x-auto scrollbar-hide border border-slate-200 dark:border-gray-800 rounded-2xl p-2 bg-white dark:bg-[#1A1C24]">
             ${tableRows}
           </div>
-          <p class="text-[10px] text-slate-400 dark:text-gray-500 font-semibold text-center italic">* ตารางสถิติแบบผันแปรแนวนอน (Column/Row Switched) ตามระยะเวลาที่เลือก</p>
+          <p class="text-[10px] text-slate-400 dark:text-gray-500 font-semibold text-center italic">* ตารางสถิติแบบผันแปรแนวนอน (Column/Row Switched)</p>
         </div>
       `;
     }
@@ -1064,14 +925,7 @@
       });
 
       // ดึงประวัติเดือนให้เห็นถ้าเปลี่ยนเป็นหน้าประวัติ
-      if(tab === 'history') {
-        renderMonthlyHistoryView();
-      }
-      
-      // ดึงสถิติตามกรองเมื่อเปิดเข้าหน้าสถิติ
-      if(tab === 'stats') {
-        renderCategoryChart(expenses);
-      }
+      if(tab === 'history') renderMonthlyHistoryView();
     }
 
     // แปลงรูปแบบวันที่ปกติเป็นรูปแบบไทย
