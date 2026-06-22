@@ -94,17 +94,20 @@
       </div>
     </section>
 
-    <!-- แท็บเมนูสลับหน้าจอการทำงาน -->
+    <!-- แท็บเมนูสลับหน้าจอการทำงาน (เพิ่ม 3 แท็บ) -->
     <div class="flex bg-slate-100 dark:bg-gray-800 p-1.5 rounded-2xl mb-6">
-      <button id="tab-add" onclick="switchTab('add')" class="flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm">
-        <i data-lucide="plus-circle" class="w-4 h-4"></i> บันทึกรายการ
+      <button id="tab-add" onclick="switchTab('add')" class="flex-1 py-3 text-[11px] font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm">
+        <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> บันทึก
       </button>
-      <button id="tab-stats" onclick="switchTab('stats')" class="flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-500 dark:text-gray-400">
-        <i data-lucide="pie-chart" class="w-4 h-4"></i> แผนภูมิสรุป
+      <button id="tab-history" onclick="switchTab('history')" class="flex-1 py-3 text-[11px] font-black rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-500 dark:text-gray-400">
+        <i data-lucide="list" class="w-3.5 h-3.5"></i> คลังประวัติ
+      </button>
+      <button id="tab-stats" onclick="switchTab('stats')" class="flex-1 py-3 text-[11px] font-black rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-500 dark:text-gray-400">
+        <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i> สถิติ
       </button>
     </div>
 
-    <!-- ส่วนที่ 1: แท็บบันทึก / หน้าประวัติรายการ -->
+    <!-- ส่วนที่ 1: แท็บบันทึก (แสดงฟอร์ม และรายการล่าสุดแค่ 5 รายการ) -->
     <div id="content-add" class="space-y-6">
       <!-- ฟอร์มกรอกบันทึกข้อมูลหลัก -->
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm transition-colors">
@@ -123,14 +126,16 @@
             </div>
             <div>
               <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">หมวดหมู่</label>
-              <select id="categoryInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
-                <option value="อาหาร">🍱 อาหาร</option>
-                <option value="เดินทาง">🚗 เดินทาง</option>
-                <option value="ค่าบริการ">⚡ ค่าบริการ / บิล</option>
-                <option value="สันทนาการ">🍿 สันทนาการ</option>
-                <option value="สุขภาพ">🏥 สุขภาพ</option>
-                <option value="อื่นๆ">🪙 อื่นๆ</option>
-              </select>
+              <div class="flex gap-2">
+                <!-- Dropdown หมวดหมู่ ถูกสร้างผ่าน JS -->
+                <select id="categoryInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-[11px] font-bold outline-none focus:border-emerald-500 transition-all">
+                  <!-- JS จะเติมข้อมูลอัตโนมัติ -->
+                </select>
+                <!-- ปุ่มเพิ่มหมวดหมู่ -->
+                <button type="button" onclick="toggleAddCategoryModal(true)" class="bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-gray-700 w-11 flex-shrink-0 rounded-xl flex items-center justify-center transition-colors">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -153,48 +158,70 @@
         </form>
       </section>
 
-      <!-- ประวัติรายการบันทึกย้อนหลัง -->
+      <!-- ประวัติรายการล่าสุด (5 รายการ) -->
       <section class="space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-extrabold flex items-center gap-2">
-            <span class="w-2 h-4 bg-teal-500 rounded"></span> ประวัติรายการล่าสุด
+            <span class="w-2 h-4 bg-teal-500 rounded"></span> ประวัติล่าสุด 
           </h3>
-          <span id="localDataNotice" class="text-[10px] bg-slate-100 dark:bg-gray-800 px-2.5 py-1 rounded-full font-bold text-slate-500 dark:text-gray-400">
-            กำลังโหลดข้อมูล...
-          </span>
-        </div>
-
-        <!-- ตัวกรองการแสดงผลย้อนหลัง -->
-        <div class="flex gap-2">
-          <div class="relative flex-1">
-            <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
-            <input type="text" id="searchInput" oninput="filterExpenses()" placeholder="ค้นหารายการ..." class="w-full bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none focus:border-emerald-500 transition-all">
-          </div>
-          <select id="filterCategory" onchange="filterExpenses()" class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl px-3 text-xs font-bold outline-none">
-            <option value="ทั้งหมด">ทุกหมวดหมู่</option>
-            <option value="อาหาร">🍱 อาหาร</option>
-            <option value="เดินทาง">🚗 เดินทาง</option>
-            <option value="ค่าบริการ">⚡ ค่าบริการ</option>
-            <option value="สันทนาการ">🍿 สันทนาการ</option>
-            <option value="สุขภาพ">🏥 สุขภาพ</option>
-            <option value="อื่นๆ">🪙 อื่นๆ</option>
-          </select>
+          <button onclick="switchTab('history')" class="text-[10px] text-emerald-500 hover:underline font-bold">ดูทั้งหมด &rarr;</button>
         </div>
 
         <!-- โหลดเดอร์แอนิเมชันสำหรับบอกสถานะการเชื่อมต่อ -->
-        <div id="loadingIndicator" class="hidden bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800/50 p-8 rounded-3xl text-center space-y-3">
+        <div id="loadingIndicatorAdd" class="hidden bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800/50 p-8 rounded-3xl text-center space-y-3">
           <div class="w-8 h-8 rounded-full border-3 border-emerald-500 border-t-transparent animate-spin mx-auto"></div>
           <p class="text-xs text-slate-500 dark:text-gray-400 font-bold animate-pulse-soft">กำลังดึงฐานข้อมูลคลาวด์...</p>
         </div>
 
-        <!-- โนดแสดงรายการผลลัพธ์ -->
-        <div id="expensesContainer" class="space-y-2">
+        <!-- โหนดแสดงรายการผลลัพธ์ (แค่ 5 รายการ) -->
+        <div id="recentExpensesContainer" class="space-y-2">
           <!-- จะนำเข้าประวัติผ่านการ Render ฝั่ง JavaScript -->
         </div>
       </section>
     </div>
 
-    <!-- ส่วนที่ 2: แท็บแผนภูมิสถิติรายจ่าย -->
+    <!-- ส่วนที่ 2: แท็บคลังประวัติ (แยกย่อยตามเดือน) -->
+    <div id="content-history" class="hidden space-y-4">
+      
+      <!-- เมนูชิปรายเดือน (แนวนอน) -->
+      <div class="relative">
+        <div class="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-slate-50 dark:from-[#0D0F14] to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-slate-50 dark:from-[#0D0F14] to-transparent z-10 pointer-events-none"></div>
+        <div id="monthChipsContainer" class="flex gap-2 overflow-x-auto scrollbar-hide py-1 px-1">
+          <!-- แถบรายเดือนจะถูกป้อนผ่าน JS -->
+        </div>
+      </div>
+
+      <!-- สรุปของเดือนที่เลือก -->
+      <div class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-4 rounded-3xl flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">รวมรายจ่ายเดือนนี้</p>
+          <h4 id="monthTotalText" class="text-lg font-black text-rose-500 dark:text-rose-400">฿0.00</h4>
+        </div>
+        <div class="text-right">
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">จำนวนรายการ</p>
+          <h4 id="monthCountText" class="text-lg font-black text-slate-700 dark:text-white">0</h4>
+        </div>
+      </div>
+
+      <!-- ตัวกรองการแสดงผลและค้นหาในคลังประวัติ -->
+      <div class="flex gap-2 mb-2">
+        <div class="relative flex-1">
+          <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
+          <input type="text" id="searchInput" oninput="filterHistory()" placeholder="ค้นหาในเดือนนี้..." class="w-full bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none focus:border-emerald-500 transition-all shadow-sm">
+        </div>
+        <select id="filterCategory" onchange="filterHistory()" class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl px-3 text-xs font-bold outline-none shadow-sm">
+          <!-- จะนำเข้าหมวดหมู่ผ่าน JS เช่นกัน -->
+        </select>
+      </div>
+
+      <!-- โหนดแสดงรายการผลลัพธ์ในเดือนนั้นๆ -->
+      <div id="historyExpensesContainer" class="space-y-2 pb-4">
+        <!-- จะนำเข้าประวัติผ่านการ Render ฝั่ง JavaScript -->
+      </div>
+    </div>
+
+    <!-- ส่วนที่ 3: แท็บแผนภูมิสถิติรายจ่าย -->
     <div id="content-stats" class="hidden space-y-6">
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm">
         <h3 class="text-sm font-extrabold flex items-center gap-2 mb-4">
@@ -205,7 +232,7 @@
         <div class="flex flex-col items-center justify-center py-6">
           <div id="chartDonut" class="w-44 h-44 rounded-full shadow-inner relative flex items-center justify-center transition-all duration-500" style="background: conic-gradient(#e2e8f0 0% 100%)">
             <div class="w-32 h-32 bg-white dark:bg-[#13151C] rounded-full flex flex-col items-center justify-center shadow-md">
-              <span class="text-[10px] font-bold text-slate-400 uppercase">สัดส่วนรวม</span>
+              <span class="text-[10px] font-bold text-slate-400 uppercase">สัดส่วนรวมทั้งหมด</span>
               <span id="chartCenterSum" class="text-base font-black text-slate-800 dark:text-white mt-0.5">฿0.00</span>
             </div>
           </div>
@@ -213,12 +240,58 @@
 
         <!-- รายละเอียดสัญลักษณ์สีประจำกลุ่มกราฟ -->
         <div id="chartLegendContainer" class="space-y-2 mt-4">
-          <!-- ข้อมูล Legend แสดงผลผ่าน JS -->
+          <!-- ข้อมูล Legend แสดงผลผ่าน JS สลับ Row/Column ตามรีเควส -->
         </div>
       </section>
     </div>
 
   </main>
+
+  <!-- หน้าต่างเพิ่มหมวดหมู่ (Custom Add Category Modal) -->
+  <div id="addCategoryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs space-y-4 shadow-xl">
+      <div class="flex items-center justify-between mb-2">
+        <h4 class="text-sm font-extrabold flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-500"></i> สร้างหมวดหมู่ใหม่
+        </h4>
+        <button onclick="toggleAddCategoryModal(false)" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-400">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div>
+        <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">ชื่อหมวดหมู่</label>
+        <input type="text" id="newCatName" placeholder="เช่น ค่ากาแฟ, ช้อปปิ้ง" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">ไอคอน (Emoji)</label>
+          <select id="newCatEmoji" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-base font-bold outline-none focus:border-emerald-500 transition-all">
+            <option value="☕">☕ กาแฟ</option>
+            <option value="🛍️">🛍️ ช้อปปิ้ง</option>
+            <option value="🏠">🏠 บ้าน</option>
+            <option value="📚">📚 การศึกษา</option>
+            <option value="🎁">🎁 ของขวัญ</option>
+            <option value="🎮">🎮 เกมส์</option>
+            <option value="✈️">✈️ ท่องเที่ยว</option>
+            <option value="🐶">🐶 สัตว์เลี้ยง</option>
+            <option value="📦">📦 พัสดุ</option>
+            <option value="💸">💸 หนี้สิน</option>
+            <option value="🏷️">🏷️ ป้ายกำกับ</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">สีประจำหมวด</label>
+          <input type="color" id="newCatColor" value="#10b981" class="w-full h-12 bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl p-1 outline-none cursor-pointer">
+        </div>
+      </div>
+
+      <button onclick="saveNewCategory()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-3.5 px-4 rounded-xl shadow-md mt-2">
+        ยืนยันการสร้าง
+      </button>
+    </div>
+  </div>
 
   <!-- หน้าต่างแก้วป็อปอัปยืนยันการลบข้อมูล (Custom Modal) -->
   <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4">
@@ -249,7 +322,8 @@
       { id: "3", date: new Date().toISOString().split('T')[0], category: "ค่าบริการ", description: "บิลค่าน้ำและไฟฟ้าสำนักงาน", amount: 1450.50 }
     ];
 
-    const CATEGORY_STYLES = {
+    // หมวดหมู่ดั้งเดิมพื้นฐาน
+    const DEFAULT_CATEGORIES = {
       "อาหาร": { emoji: "🍱", color: "from-amber-400 to-orange-500", hex: "#f59e0b" },
       "เดินทาง": { emoji: "🚗", color: "from-blue-400 to-indigo-500", hex: "#3b82f6" },
       "ค่าบริการ": { emoji: "⚡", color: "from-emerald-400 to-teal-500", hex: "#10b981" },
@@ -258,15 +332,22 @@
       "อื่นๆ": { emoji: "🪙", color: "from-slate-400 to-gray-500", hex: "#64748b" }
     };
 
+    // ตัวแปรส่วนกลาง
     let expenses = [];
-    let isCloudMode = true; // เปิดใช้โหมดคลาวด์เป็นค่าเริ่มต้นเสมอ
-    let webAppUrl = "https://script.google.com/macros/s/AKfycbxbSjAmcYtjeZHsZsKjC1DVQhsvfDxq76oqbZAeC1Bd7FBPQxRhP3zbNZTeAPnkKTNA/exec"; // ฝัง URL ล่าสุดโดยตรง
+    let isCloudMode = true; 
+    let webAppUrl = "https://script.google.com/macros/s/AKfycbzdrGqR8p1bhVuyLbKdYuPMYAvL0cRe7NZ5bcyqsXO2rtQGY3gZO0SU8RUJZ7P-T5Wa/exec"; 
     let editingId = null;
     let deleteIdTarget = null;
+    let selectedMonth = ""; // เก็บค่าเดือนที่เลือกในแท็บคลังประวัติ (รูปแบบ YYYY-MM)
+
+    // โหลดหมวดหมู่ที่ผู้ใช้สร้างเองจาก localStorage
+    let customCategories = JSON.parse(localStorage.getItem('expense_custom_categories')) || {};
+    let CATEGORY_STYLES = { ...DEFAULT_CATEGORIES, ...customCategories };
 
     // ระบบทำงานเมื่อเริ่มต้น (DOMContentLoaded)
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
+      populateCategorySelects(); // เรนเดอร์ Dropdown ใหม่ทุกครั้งที่มีการอัปเดต
       
       updateStatusBadge(true, "เชื่อมคลาวด์สด");
       fetchExpensesFromCloud();
@@ -277,7 +358,6 @@
       lucide.createIcons();
     });
 
-    // ตรวจสอบและตั้งธีม Dark/Light
     function initTheme() {
       if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
@@ -296,26 +376,86 @@
       lucide.createIcons();
     }
 
-    // อัปเดตไอคอนเชื่อมต่อ
     function updateStatusBadge(active, text) {
       const badge = document.getElementById('syncStatusBadge');
       const badgeText = document.getElementById('syncStatusText');
-      const notice = document.getElementById('localDataNotice');
+      const noticeAdd = document.getElementById('localDataNotice');
 
-      if (active) {
-        badge.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-        badgeText.innerText = text;
-        notice.innerText = "คลาวด์ Google Sheet";
-        notice.className = "text-[10px] bg-emerald-100 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full font-bold text-emerald-600 dark:text-emerald-400";
-      } else {
-        badge.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
-        badgeText.innerText = text;
-        notice.innerText = "โหมดทดลองเซฟในเครื่อง";
-        notice.className = "text-[10px] bg-amber-100 dark:bg-amber-950/40 px-2.5 py-1 rounded-full font-bold text-amber-600 dark:text-amber-400";
+      const bgClass = active ? "bg-emerald-500" : "bg-amber-500";
+      badge.className = `w-2 h-2 rounded-full ${bgClass} animate-pulse`;
+      badgeText.innerText = text;
+      
+      if(noticeAdd) {
+        noticeAdd.innerText = active ? "คลาวด์ Google Sheet" : "โหมดทดลองเซฟในเครื่อง";
+        noticeAdd.className = active 
+          ? "text-[10px] bg-emerald-100 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full font-bold text-emerald-600 dark:text-emerald-400"
+          : "text-[10px] bg-amber-100 dark:bg-amber-950/40 px-2.5 py-1 rounded-full font-bold text-amber-600 dark:text-amber-400";
       }
     }
 
-    // โหลดฐานข้อมูลจาก LocalStorage เมื่อไม่ได้ต่อคลาวด์ (กรณีระบบคลาวด์มีปัญหา)
+    // ================= ระบบจัดการหมวดหมู่ =================
+    function populateCategorySelects() {
+      const catInput = document.getElementById('categoryInput');
+      const filterInput = document.getElementById('filterCategory');
+      
+      let optionsHTML = '';
+      let filterHTML = '<option value="ทั้งหมด">ทุกหมวดหมู่</option>';
+
+      // ดึงคีย์ทั้งหมดมา แต่เอา "อื่นๆ" ออกก่อน
+      const keys = Object.keys(CATEGORY_STYLES).filter(k => k !== 'อื่นๆ');
+      
+      keys.forEach(k => {
+        const str = `<option value="${k}">${CATEGORY_STYLES[k].emoji} ${k}</option>`;
+        optionsHTML += str;
+        filterHTML += str;
+      });
+
+      // ดัน "อื่นๆ" ให้ต่อท้ายสุดเสมอ
+      const othersOption = `<option value="อื่นๆ">${CATEGORY_STYLES['อื่นๆ'].emoji} อื่นๆ</option>`;
+      optionsHTML += othersOption;
+      filterHTML += othersOption;
+
+      if(catInput) catInput.innerHTML = optionsHTML;
+      if(filterInput) filterInput.innerHTML = filterHTML;
+    }
+
+    function toggleAddCategoryModal(show) {
+      const modal = document.getElementById('addCategoryModal');
+      modal.style.display = show ? 'flex' : 'none';
+      if(show) {
+        document.getElementById('newCatName').value = "";
+      }
+    }
+
+    function saveNewCategory() {
+      const name = document.getElementById('newCatName').value.trim();
+      const emoji = document.getElementById('newCatEmoji').value;
+      const hex = document.getElementById('newCatColor').value;
+
+      if (!name) {
+        showToast("กรุณากรอกชื่อหมวดหมู่", "alert-circle");
+        return;
+      }
+      if (CATEGORY_STYLES[name]) {
+        showToast("มีหมวดหมู่นี้อยู่แล้ว", "alert-circle");
+        return;
+      }
+
+      // บันทึกและรวมสไตล์ใหม่
+      customCategories[name] = { emoji: emoji, color: "bg-slate-200", hex: hex }; // ให้สีแสดงผลเป็น hex ถาวร
+      CATEGORY_STYLES = { ...DEFAULT_CATEGORIES, ...customCategories };
+      
+      localStorage.setItem('expense_custom_categories', JSON.stringify(customCategories));
+      
+      populateCategorySelects();
+      toggleAddCategoryModal(false);
+      
+      // อัปเดต dropdown ให้เลือกหมวดที่เพิ่งสร้าง
+      document.getElementById('categoryInput').value = name;
+      showToast("สร้างหมวดหมู่ใหม่สำเร็จ!", "check-circle");
+    }
+
+    // ================= ระบบดึงข้อมูลคลาวด์ =================
     function loadLocalExpenses() {
       const localData = localStorage.getItem(DEMO_KEY);
       if (localData) {
@@ -327,20 +467,15 @@
       renderDataAndStats();
     }
 
-    // ดึงข้อมูลค่าใช้จ่ายทั้งหมดจาก Google Web App
     function fetchExpensesFromCloud() {
-      const container = document.getElementById('expensesContainer');
-      const loader = document.getElementById('loadingIndicator');
+      const addLoader = document.getElementById('loadingIndicatorAdd');
       
-      container.classList.add('hidden');
-      loader.classList.remove('hidden');
+      if(addLoader) addLoader.classList.remove('hidden');
 
       fetch(`${webAppUrl}?action=getExpenses`, {
         method: 'GET',
         mode: 'cors',
-        headers: {
-          'Accept': 'application/json'
-        }
+        headers: { 'Accept': 'application/json' }
       })
       .then(res => {
         if (!res.ok) throw new Error("สถานะเซิร์ฟเวอร์คลาวด์ไม่ปกติ");
@@ -349,96 +484,158 @@
       .then(data => {
         expenses = Array.isArray(data) ? data : [];
         renderDataAndStats();
-        loader.classList.add('hidden');
-        container.classList.remove('hidden');
-        showToast("ซิงก์ข้อมูลกับชีทสำเร็จ", "cloud-lightning");
+        if(addLoader) addLoader.classList.add('hidden');
+        showToast("ซิงก์ข้อมูลคลาวด์เรียบร้อย", "cloud-lightning");
       })
       .catch(err => {
         console.error(err);
-        loader.classList.add('hidden');
-        container.classList.remove('hidden');
-        showToast("เชื่อมคลาวด์ล้มเหลว สลับไปโหมดทดลองในเครื่อง", "alert-triangle");
+        if(addLoader) addLoader.classList.add('hidden');
+        showToast("เชื่อมคลาวด์ล้มเหลว สลับเป็นโหมดจำลอง", "alert-triangle");
         isCloudMode = false;
-        updateStatusBadge(false, "ดึงข้อมูลจากชีทไม่ได้");
+        updateStatusBadge(false, "ดึงข้อมูลไม่ได้");
         loadLocalExpenses();
       });
     }
 
-    // แสดงผลข้อมูลและสถิติพร้อมกัน
+    // ================= ระบบ Render =================
     function renderDataAndStats() {
-      renderExpenses(expenses);
+      // หน้า 1: เรนเดอร์ประวัติล่าสุด 5 อันดับแรก
+      renderRecentExpenses(expenses.slice(0, 5));
+      // หน้า 2: เรนเดอร์คลังรายเดือน
+      renderMonthlyHistoryView();
+      // หน้าสรุปยอดหลัก
       updateSummaryCards(expenses);
+      // หน้า 3: แผนภูมิวงกลม
       renderCategoryChart(expenses);
     }
 
-    // แสดงรายการเบิกจ่ายในรูปแบบประวัติการทำรายการ
-    function renderExpenses(items) {
-      const container = document.getElementById('expensesContainer');
+    function createExpenseCard(item) {
+      const cat = CATEGORY_STYLES[item.category] || CATEGORY_STYLES["อื่นๆ"];
+      const card = document.createElement('div');
+      card.className = "bg-white dark:bg-[#13151C] border border-slate-200/40 dark:border-gray-800/30 p-4 rounded-2xl flex items-center justify-between hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all shadow-sm group";
+      
+      card.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-slate-50 dark:bg-gray-800 rounded-xl flex items-center justify-center text-lg shadow-sm" style="color: ${cat.hex}">
+            ${cat.emoji}
+          </div>
+          <div>
+            <p class="text-xs font-bold text-slate-800 dark:text-white leading-snug">${item.description}</p>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-[9.5px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-wide">${item.category}</span>
+              <span class="text-[9.5px] text-slate-300 dark:text-gray-700">•</span>
+              <span class="text-[9.5px] font-semibold text-slate-400 dark:text-gray-500">${formatDateThai(item.date)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-black text-slate-800 dark:text-white">฿${parseFloat(item.amount).toLocaleString('th-TH', {minimumFractionDigits: 2})}</span>
+          <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <button onclick="startEditMode('${item.id}', '${item.date}', '${item.category}', '${item.description}', ${item.amount})" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 text-blue-500">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="triggerDelete('${item.id}')" class="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-500">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `;
+      return card;
+    }
+
+    // เรนเดอร์หน้าบันทึก (ล่าสุด 5 อัน)
+    function renderRecentExpenses(items) {
+      const container = document.getElementById('recentExpensesContainer');
       container.innerHTML = "";
 
       if (items.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white dark:bg-[#13151C] border border-slate-200/50 dark:border-gray-800/40 p-10 rounded-3xl text-center space-y-2">
-            <div class="text-3xl">📭</div>
-            <p class="text-xs text-slate-500 font-bold dark:text-gray-400">ยังไม่มีประวัติรายการเบิกจ่าย</p>
-          </div>
-        `;
+        container.innerHTML = `<div class="bg-slate-50 dark:bg-[#13151C] p-6 rounded-3xl text-center"><p class="text-xs text-slate-400 font-bold">ไม่มีประวัติรายการ</p></div>`;
         return;
       }
 
       items.forEach(item => {
-        const cat = CATEGORY_STYLES[item.category] || CATEGORY_STYLES["อื่นๆ"];
-        
-        const card = document.createElement('div');
-        card.className = "bg-white dark:bg-[#13151C] border border-slate-200/40 dark:border-gray-800/30 p-4 rounded-2xl flex items-center justify-between hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all shadow-sm group";
-        
-        card.innerHTML = `
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-slate-50 dark:bg-gray-800 rounded-xl flex items-center justify-center text-lg shadow-sm">
-              ${cat.emoji}
-            </div>
-            <div>
-              <p class="text-xs font-bold text-slate-800 dark:text-white leading-snug">${item.description}</p>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-[9.5px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-wide">${item.category}</span>
-                <span class="text-[9.5px] text-slate-300 dark:text-gray-700">•</span>
-                <span class="text-[9.5px] font-semibold text-slate-400 dark:text-gray-500">${formatDateThai(item.date)}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-black text-slate-800 dark:text-white">฿${parseFloat(item.amount).toLocaleString('th-TH', {minimumFractionDigits: 2})}</span>
-            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <button onclick="startEditMode('${item.id}', '${item.date}', '${item.category}', '${item.description}', ${item.amount})" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 text-blue-500">
-                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-              </button>
-              <button onclick="triggerDelete('${item.id}')" class="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-500">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
+        container.appendChild(createExpenseCard(item));
       });
       lucide.createIcons();
     }
 
-    // คัดกรองและค้นหารายการ
-    function filterExpenses() {
-      const search = document.getElementById('searchInput').value.trim().toLowerCase();
-      const catFilter = document.getElementById('filterCategory').value;
-
-      let filtered = expenses.filter(item => {
-        const matchesSearch = item.description.toLowerCase().includes(search) || item.category.toLowerCase().includes(search);
-        const matchesCat = (catFilter === "ทั้งหมด") || (item.category === catFilter);
-        return matchesSearch && matchesCat;
-      });
-
-      renderExpenses(filtered);
+    // ================= ระบบคลังประวัติแยกเดือน =================
+    function getUniqueMonths(items) {
+       const months = new Set();
+       items.forEach(item => {
+           if(item.date) months.add(item.date.substring(0, 7)); // YYYY-MM
+       });
+       return Array.from(months).sort().reverse();
     }
 
-    // คำนวณสรุปค่าใช้จ่ายยอดรวมบนหน้าแดชบอร์ดหลัก
+    function renderMonthlyHistoryView() {
+      const months = getUniqueMonths(expenses);
+      const chipContainer = document.getElementById('monthChipsContainer');
+      
+      // ถ้าไม่เคยมีเดือนถูกเลือก ให้เลือกเดือนล่าสุด (แรกสุด)
+      if (!selectedMonth && months.length > 0) {
+        selectedMonth = months[0];
+      }
+
+      // วาดชิปรายเดือน
+      chipContainer.innerHTML = "";
+      if (months.length === 0) {
+        chipContainer.innerHTML = `<span class="text-[10px] text-slate-400 font-bold px-2">ไม่มีข้อมูลเดือน</span>`;
+      } else {
+        months.forEach(m => {
+          const btn = document.createElement('button');
+          const isSelected = (m === selectedMonth);
+          btn.className = isSelected 
+            ? "px-4 py-2 bg-emerald-500 text-white text-[11px] font-black rounded-xl shadow-md whitespace-nowrap transition-all"
+            : "px-4 py-2 bg-white dark:bg-[#1A1C24] text-slate-500 dark:text-gray-400 text-[11px] font-bold rounded-xl shadow-sm border border-slate-200 dark:border-gray-800 whitespace-nowrap transition-all hover:bg-slate-50 dark:hover:bg-gray-800";
+          btn.innerText = formatMonthYearThai(m);
+          btn.onclick = () => {
+            selectedMonth = m;
+            document.getElementById('searchInput').value = ""; // รีเซ็ตการค้นหาเมื่อสลับเดือน
+            document.getElementById('filterCategory').value = "ทั้งหมด";
+            renderMonthlyHistoryView(); // วาดใหม่เพื่อไฮไลต์ชิปและอัปเดตลิสต์
+          };
+          chipContainer.appendChild(btn);
+        });
+      }
+
+      filterHistory(); // กรองตามเดือนที่เลือก (และตามช่องค้นหาที่มี)
+    }
+
+    // กรองและเรนเดอร์ในแท็บคลังประวัติ (รายเดือน)
+    function filterHistory() {
+      const search = document.getElementById('searchInput').value.trim().toLowerCase();
+      const catFilter = document.getElementById('filterCategory').value;
+      const historyContainer = document.getElementById('historyExpensesContainer');
+
+      // กรองจากเดือนที่เลือกก่อน แล้วตามด้วยช่องค้นหาและหมวดหมู่
+      let filtered = expenses.filter(item => {
+        const matchesMonth = item.date && item.date.startsWith(selectedMonth);
+        const matchesSearch = item.description.toLowerCase().includes(search) || item.category.toLowerCase().includes(search);
+        const matchesCat = (catFilter === "ทั้งหมด") || (item.category === catFilter);
+        return matchesMonth && matchesSearch && matchesCat;
+      });
+
+      // สรุปยอดรวมเฉพาะเดือนที่เลือก
+      let monthTotal = 0;
+      filtered.forEach(item => monthTotal += parseFloat(item.amount));
+      document.getElementById('monthTotalText').innerText = `฿${monthTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
+      document.getElementById('monthCountText').innerText = `${filtered.length} รายการ`;
+
+      // แสดงลิสต์ข้อมูล
+      historyContainer.innerHTML = "";
+      if (filtered.length === 0) {
+        historyContainer.innerHTML = `<div class="bg-white dark:bg-[#1A1C24] border border-slate-200/50 dark:border-gray-800/40 p-10 rounded-3xl text-center space-y-2 mt-2"><div class="text-3xl">📭</div><p class="text-xs text-slate-500 font-bold dark:text-gray-400">ไม่พบรายการในเดือนนี้</p></div>`;
+      } else {
+        filtered.forEach(item => {
+          historyContainer.appendChild(createExpenseCard(item));
+        });
+      }
+      lucide.createIcons();
+    }
+
+    // ================= คำนวณสรุปหน้าสถิติและหน้าแรก =================
     function updateSummaryCards(items) {
       const total = items.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
       document.getElementById('totalBalanceText').innerText = `฿${total.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
@@ -452,7 +649,7 @@
       document.getElementById('totalCountText').innerText = `${items.length} รายการ`;
     }
 
-    // อัปเดตกราฟสัดส่วนพร้อมการสรุปสถิติแบบกลับคอลัมน์กับแถว (Swapped Rows/Columns)
+    // เรนเดอร์สถิติ แถว/คอลัมน์สลับด้าน
     function renderCategoryChart(items) {
       const donut = document.getElementById('chartDonut');
       const legendContainer = document.getElementById('chartLegendContainer');
@@ -480,21 +677,21 @@
 
       // การจัดหมวดหมู่ในลักษณะสลับแถวคอลัมน์ (Pivot Column to Rows)
       let tableRows = `
-        <table class="w-full text-xs text-left text-slate-500 dark:text-gray-400 border-collapse mt-2">
+        <table class="w-full text-[11px] text-left text-slate-500 dark:text-gray-400 border-collapse mt-2">
           <thead>
             <tr class="bg-slate-50 dark:bg-gray-800/40 text-slate-700 dark:text-gray-300">
-              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold">หมวดหมู่ข้อมูล</th>
-              ${Object.keys(sums).map(cat => `<th class="p-2 border border-slate-200 dark:border-gray-800 font-extrabold text-center">${CATEGORY_STYLES[cat]?.emoji || '🪙'} ${cat}</th>`).join('')}
+              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold whitespace-nowrap">หมวดหมู่</th>
+              ${Object.keys(sums).map(cat => `<th class="p-2 border border-slate-200 dark:border-gray-800 font-extrabold text-center whitespace-nowrap">${CATEGORY_STYLES[cat]?.emoji || '🪙'} ${cat}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white">รวมค่าใช้จ่าย</td>
-              ${Object.keys(sums).map(cat => `<td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center text-slate-900 dark:text-white">฿${sums[cat].toLocaleString('th-TH', {minimumFractionDigits: 1})}</td>`).join('')}
+              <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white whitespace-nowrap">รวมค่าใช้จ่าย</td>
+              ${Object.keys(sums).map(cat => `<td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center text-slate-900 dark:text-white whitespace-nowrap">฿${sums[cat].toLocaleString('th-TH', {minimumFractionDigits: 1})}</td>`).join('')}
             </tr>
             <tr>
-              <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white">คิดเป็นร้อยละ</td>
-              ${Object.keys(sums).map(cat => `<td class="p-2 border border-slate-200 dark:border-gray-800 text-center font-bold text-emerald-600 dark:text-emerald-400">${((sums[cat]/grandTotal)*100).toFixed(1)}%</td>`).join('')}
+              <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white whitespace-nowrap">ร้อยละ (%)</td>
+              ${Object.keys(sums).map(cat => `<td class="p-2 border border-slate-200 dark:border-gray-800 text-center font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">${((sums[cat]/grandTotal)*100).toFixed(1)}%</td>`).join('')}
             </tr>
           </tbody>
         </table>
@@ -506,7 +703,7 @@
         const startDeg = accumulatedPercent;
         accumulatedPercent += percentage;
 
-        conicSlices.push(`${style.hex} ${startDeg}% ${accumulatedPercent}%`);
+        conicSlices.push(`${style.hex || '#64748b'} ${startDeg}% ${accumulatedPercent}%`);
       });
 
       donut.style.background = `conic-gradient(${conicSlices.join(', ')})`;
@@ -521,7 +718,7 @@
       `;
     }
 
-    // บันทึกหรือแก้ไขรายการ
+    // ================= ฟอร์มเพิ่ม / ลบ / แก้ไขข้อมูล =================
     function handleFormSubmit(e) {
       e.preventDefault();
 
@@ -596,9 +793,12 @@
       }
     }
 
-    // เริ่มทำงานในโหมดแก้ไขข้อมูล
     function startEditMode(id, date, category, description, amount) {
       editingId = id;
+      
+      // ถ้าอยู่แท็บอื่นให้สลับกลับมาแท็บแก้ไข
+      switchTab('add');
+
       document.getElementById('dateInput').value = date;
       document.getElementById('categoryInput').value = category;
       document.getElementById('descInput').value = description;
@@ -613,7 +813,6 @@
       lucide.createIcons();
     }
 
-    // ยกเลิกการแก้ไขข้อมูล
     function cancelEditMode() {
       resetForm();
       editingId = null;
@@ -634,7 +833,6 @@
       lucide.createIcons();
     }
 
-    // ดำเนินการขั้นตอนการลบข้อมูล
     function triggerDelete(id) {
       deleteIdTarget = id;
       toggleDeleteModal(true);
@@ -709,25 +907,28 @@
       }, 3000);
     }
 
+    // การควบคุมการเปลี่ยนหน้าจอ (3 แท็บ)
     function switchTab(tab) {
-      const tabAdd = document.getElementById('tab-add');
-      const tabStats = document.getElementById('tab-stats');
-      const contentAdd = document.getElementById('content-add');
-      const contentStats = document.getElementById('content-stats');
+      const tabs = ['add', 'history', 'stats'];
+      
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const content = document.getElementById(`content-${t}`);
+        
+        if (t === tab) {
+          btn.className = "flex-1 py-3 text-[11px] font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm";
+          content.classList.remove('hidden');
+        } else {
+          btn.className = "flex-1 py-3 text-[11px] font-black rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-500 dark:text-gray-400 hover:bg-slate-200/50 dark:hover:bg-gray-700/50";
+          content.classList.add('hidden');
+        }
+      });
 
-      if (tab === 'add') {
-        tabAdd.className = "flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm";
-        tabStats.className = "flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-500 dark:text-gray-400";
-        contentAdd.classList.remove('hidden');
-        contentStats.classList.add('hidden');
-      } else {
-        tabStats.className = "flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm";
-        tabAdd.className = "flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-500 dark:text-gray-400";
-        contentAdd.classList.add('hidden');
-        contentStats.classList.remove('hidden');
-      }
+      // ดึงประวัติเดือนให้เห็นถ้าเปลี่ยนเป็นหน้าประวัติ
+      if(tab === 'history') renderMonthlyHistoryView();
     }
 
+    // แปลงรูปแบบวันที่ปกติเป็นรูปแบบไทย
     function formatDateThai(dateStr) {
       if (!dateStr) return "";
       const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
@@ -738,6 +939,18 @@
       const month = months[parseInt(p[1]) - 1];
       const year = parseInt(p[0]) + 543;
       return `${day} ${month} ${year}`;
+    }
+
+    // แปลงรูปแบบ YYYY-MM เป็นเดือน-ปี แบบไทยสำหรับชิป
+    function formatMonthYearThai(ym) {
+      if (!ym) return "";
+      const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      const p = ym.split('-');
+      if (p.length !== 2) return ym;
+      
+      const month = months[parseInt(p[1]) - 1];
+      const year = parseInt(p[0]) + 543;
+      return `${month} ${year}`;
     }
   </script>
 </body>
