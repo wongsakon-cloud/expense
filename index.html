@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>แอปบันทึกและเบิกจ่ายเงิน (Cloud Sync)</title>
   
+  <!-- นำเข้าทรัพยากรการแสดงผลที่จำเป็นเพื่อความเสถียรเมื่อรันบน GitHub -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -45,6 +46,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-[#0D0F14] dark:text-gray-100 min-h-screen font-sans flex flex-col pb-12">
 
+  <!-- ส่วนหัวเว็บ (Header & Settings) -->
   <header class="sticky top-0 z-30 bg-white/80 dark:bg-[#0D0F14]/80 backdrop-blur-md border-b border-slate-200/50 dark:border-gray-800/50 px-4 py-3 transition-colors">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2">
@@ -61,10 +63,12 @@
       </div>
       
       <div class="flex items-center gap-2">
+        <!-- ปุ่มเปิดลิ้นชักการตั้งค่าเชื่อมต่อ -->
         <button onclick="toggleSettingsModal(true)" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all relative">
           <i data-lucide="settings" class="w-4 h-4"></i>
           <span id="settingsAlertDot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white dark:border-[#0D0F14]"></span>
         </button>
+        <!-- ปุ่มเปิดปิดโหมดมืด -->
         <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all">
           <i id="themeIcon" data-lucide="sun" class="w-4 h-4"></i>
         </button>
@@ -72,8 +76,10 @@
     </div>
   </header>
 
+  <!-- เนื้อหาหลักของแอปพลิเคชัน -->
   <main class="flex-1 w-full max-w-md mx-auto px-4 mt-6">
     
+    <!-- แดชบอร์ดสรุปยอดเงินแบบการ์ดแก้วพรีเมียม -->
     <section class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden mb-6">
       <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
       <div class="absolute -left-10 -top-10 w-32 h-32 bg-teal-400/20 rounded-full blur-xl"></div>
@@ -93,6 +99,7 @@
       </div>
     </section>
 
+    <!-- แท็บเมนูสลับหน้าจอการทำงาน -->
     <div class="flex bg-slate-100 dark:bg-gray-800 p-1.5 rounded-2xl mb-6">
       <button id="tab-add" onclick="switchTab('add')" class="flex-1 py-3 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm">
         <i data-lucide="plus-circle" class="w-4 h-4"></i> บันทึกรายการ
@@ -102,7 +109,9 @@
       </button>
     </div>
 
+    <!-- ส่วนที่ 1: แท็บบันทึก / หน้าประวัติรายการ -->
     <div id="content-add" class="space-y-6">
+      <!-- ฟอร์มกรอกบันทึกข้อมูลหลัก -->
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm transition-colors">
         <div class="flex items-center justify-between mb-4">
           <h3 id="formTitle" class="text-sm font-extrabold flex items-center gap-2">
@@ -149,6 +158,7 @@
         </form>
       </section>
 
+      <!-- ประวัติรายการบันทึกย้อนหลัง -->
       <section class="space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-extrabold flex items-center gap-2">
@@ -159,6 +169,7 @@
           </span>
         </div>
 
+        <!-- ตัวกรองการแสดงผลย้อนหลัง -->
         <div class="flex gap-2">
           <div class="relative flex-1">
             <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
@@ -175,38 +186,46 @@
           </select>
         </div>
 
+        <!-- โหลดเดอร์แอนิเมชันสำหรับบอกสถานะการเชื่อมต่อ -->
         <div id="loadingIndicator" class="hidden bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800/50 p-8 rounded-3xl text-center space-y-3">
           <div class="w-8 h-8 rounded-full border-3 border-emerald-500 border-t-transparent animate-spin mx-auto"></div>
           <p class="text-xs text-slate-500 dark:text-gray-400 font-bold animate-pulse-soft">กำลังดึงฐานข้อมูลคลาวด์...</p>
         </div>
 
+        <!-- โนดแสดงรายการผลลัพธ์ -->
         <div id="expensesContainer" class="space-y-2">
-          </div>
+          <!-- จะนำเข้าประวัติผ่านการ Render ฝั่ง JavaScript -->
+        </div>
       </section>
     </div>
 
+    <!-- ส่วนที่ 2: แท็บแผนภูมิสถิติรายจ่าย -->
     <div id="content-stats" class="hidden space-y-6">
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm">
         <h3 class="text-sm font-extrabold flex items-center gap-2 mb-4">
           <span class="w-2 h-4 bg-purple-500 rounded"></span> สัดส่วนรายจ่ายตามหมวดหมู่
         </h3>
 
+        <!-- กราฟวงกลมจำลองด้วย SVG & conic-gradient -->
         <div class="flex flex-col items-center justify-center py-6">
           <div id="chartDonut" class="w-44 h-44 rounded-full shadow-inner relative flex items-center justify-center transition-all duration-500" style="background: conic-gradient(#e2e8f0 0% 100%)">
             <div class="w-32 h-32 bg-white dark:bg-[#13151C] rounded-full flex flex-col items-center justify-center shadow-md">
-              <span class="text-[10px] font-bold text-slate-400 uppercase">สัดส่วนวันนี้</span>
+              <span class="text-[10px] font-bold text-slate-400 uppercase">สัดส่วนรวม</span>
               <span id="chartCenterSum" class="text-base font-black text-slate-800 dark:text-white mt-0.5">฿0.00</span>
             </div>
           </div>
         </div>
 
+        <!-- รายละเอียดสัญลักษณ์สีประจำกลุ่มกราฟ -->
         <div id="chartLegendContainer" class="space-y-2 mt-4">
-          </div>
+          <!-- ข้อมูล Legend แสดงผลผ่าน JS -->
+        </div>
       </section>
     </div>
 
   </main>
 
+  <!-- หน้าต่างแก้วป็อปอัปยืนยันการลบข้อมูล (Custom Modal) -->
   <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs text-center space-y-4 shadow-xl">
       <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/30 rounded-2xl flex items-center justify-center mx-auto text-rose-500">
@@ -223,6 +242,7 @@
     </div>
   </div>
 
+  <!-- หน้าต่างลิ้นชักการตั้งค่าเชื่อมต่อคลาวด์ (Settings Drawer/Modal) -->
   <div id="settingsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl relative">
       <div class="flex items-center justify-between">
@@ -256,10 +276,11 @@
     </div>
   </div>
 
+  <!-- ระบบป็อปอัปแจ้งเตือนลอยพริ้วไหว (Floating Toasts Manager) -->
   <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+  <!-- ----------------- ส่วนระบบควบคุมโปรแกรมหลักผ่านสคริปต์ JavaScript ----------------- -->
   <script>
-    // ข้อมูลเริ่มต้นสำหรับรันเมื่อระบบเปิดทำงาน (โหมดสาธิตหากไม่มีคีย์คลาวด์)
     const DEMO_KEY = "expense_tracker_demo_data";
     const MOCK_EXPENSES = [
       { id: "1", date: new Date().toISOString().split('T')[0], category: "อาหาร", description: "อาหารมื้อกลางวันยอดฮิต", amount: 120 },
@@ -277,24 +298,22 @@
     };
 
     let expenses = [];
-    let isCloudMode = true; // เปิดใช้งานโหมดคลาวด์เป็นค่าเริ่มต้น
-    let webAppUrl = "https://script.google.com/macros/s/AKfycbzKE9LqG62g4xQeGbOi6ZfKvx5gAtCjzZFYlauCHQe_10iBded4yTnEiS7Bz688NEpb/exec"; // ฝั่ง URL ของคุณโดยตรง
+    let isCloudMode = true; // เปิดใช้โหมดคลาวด์เป็นค่าเริ่มต้น
+    let webAppUrl = "https://script.google.com/macros/s/AKfycbwtzuTJEPGpG-9mS5OGt-jqjk6Ar-IZ5d6-MXiptMXo-ht6Lzh9tbsti8GkFVu2pgLi/exec"; // ฝัง URL ของคุณโดยตรง
     let editingId = null;
     let deleteIdTarget = null;
 
     // ระบบทำงานเมื่อเริ่มต้น (DOMContentLoaded)
     window.addEventListener('DOMContentLoaded', () => {
-      // ตรวจสอบธีม
       initTheme();
       
-      // ตั้งค่า URL เริ่มต้นลงใน input field ของเมนูตั้งค่า
+      // ตั้งค่า URL แหล่งข้อมูลในกล่องตั้งค่าล่วงหน้า
       document.getElementById('settingsUrlInput').value = webAppUrl;
       document.getElementById('settingsAlertDot').classList.add('hidden');
       
       updateStatusBadge(true, "เชื่อมคลาวด์สด");
       fetchExpensesFromCloud();
       
-      // ตั้งค่าวินาทีปัจจุบันลงในฟิลด์ปฏิทิน
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('dateInput').value = today;
       
@@ -345,7 +364,7 @@
       modal.style.display = show ? 'flex' : 'none';
     }
 
-    // โหลดฐานข้อมูลจากคลาสเครื่องเมื่อไม่มีคลาวด์
+    // โหลดฐานข้อมูลจาก LocalStorage เมื่อไม่ได้ต่อคลาวด์
     function loadLocalExpenses() {
       const localData = localStorage.getItem(DEMO_KEY);
       if (localData) {
@@ -357,7 +376,7 @@
       renderDataAndStats();
     }
 
-    // ดึงค่ารายการเบิกจ่ายจาก Cloud Google Web App
+    // ดึงข้อมูลค่าใช้จ่ายทั้งหมดจาก Google Web App
     function fetchExpensesFromCloud() {
       const container = document.getElementById('expensesContainer');
       const loader = document.getElementById('loadingIndicator');
@@ -365,7 +384,6 @@
       container.classList.add('hidden');
       loader.classList.remove('hidden');
 
-      // ตรวจสอบการยิง GET request ที่ปลอดภัยไร้ preflight
       fetch(`${webAppUrl}?action=getExpenses`, {
         method: 'GET',
         mode: 'cors',
@@ -374,7 +392,7 @@
         }
       })
       .then(res => {
-        if (!res.ok) throw new Error("สถานะเซิร์ฟเวอร์คลาวด์แจ้งเตือนผิดปกติ");
+        if (!res.ok) throw new Error("สถานะเซิร์ฟเวอร์คลาวด์ไม่ปกติ");
         return res.json();
       })
       .then(data => {
@@ -388,14 +406,14 @@
         console.error(err);
         loader.classList.add('hidden');
         container.classList.remove('hidden');
-        showToast("เชื่อมคลาวด์ล้มเหลว สลับเป็นโหมดจำลองชั่วคราว", "alert-triangle");
+        showToast("เชื่อมคลาวด์ล้มเหลว สลับไปโหมดทดลองในเครื่อง", "alert-triangle");
         isCloudMode = false;
-        updateStatusBadge(false, "เกิดข้อผิดพลาดในการดึงข้อมูล");
+        updateStatusBadge(false, "ดึงข้อมูลจากชีทไม่ได้");
         loadLocalExpenses();
       });
     }
 
-    // บันทึกที่อยู่เชื่อมต่อไปยังเซสชัน
+    // บันทึกการตั้งค่า URL ใหม่
     function saveSettings() {
       const inputVal = document.getElementById('settingsUrlInput').value.trim();
       if (!inputVal) {
@@ -422,7 +440,7 @@
       fetchExpensesFromCloud();
     }
 
-    // ฟังก์ชันทดสอบการเชื่อมต่อ
+    // ฟังก์ชันทดสอบความพร้อมของการเชื่อมต่อ
     function testCloudConnection() {
       const inputVal = document.getElementById('settingsUrlInput').value.trim();
       if (!inputVal) {
@@ -438,25 +456,25 @@
       fetch(inputVal, { method: 'GET', mode: 'cors' })
         .then(res => res.json())
         .then(resData => {
-          showToast("เชื่อมต่อฐานข้อมูลสำเร็จ!", "check-circle");
+          showToast("เชื่อมต่อสำเร็จ: API พร้อมทำงาน!", "check-circle");
           btn.innerText = originalText;
           btn.disabled = false;
         })
         .catch(err => {
-          showToast("เชื่อมล้มเหลว เช็กสิทธิ์ Everyone ในการ Deploy", "x-circle");
+          showToast("เชื่อมล้มเหลว! กรุณาเช็กการตั้งค่า Deployment", "x-circle");
           btn.innerText = originalText;
           btn.disabled = false;
         });
     }
 
-    // บดบังข้อมูลแสดงผลและสถิติ
+    // แสดงผลข้อมูลและสถิติพร้อมกัน
     function renderDataAndStats() {
       renderExpenses(expenses);
       updateSummaryCards(expenses);
       renderCategoryChart(expenses);
     }
 
-    // วาดไอเทมประวัติเบิกจ่ายทั้งหมดลงหน้าจอ
+    // แสดงรายการเบิกจ่ายในรูปแบบประวัติการทำรายการ
     function renderExpenses(items) {
       const container = document.getElementById('expensesContainer');
       container.innerHTML = "";
@@ -509,7 +527,7 @@
       lucide.createIcons();
     }
 
-    // ค้นหาและคัดกรองข้อมูลประวัติเบิกจ่าย
+    // คัดกรองและค้นหารายการ
     function filterExpenses() {
       const search = document.getElementById('searchInput').value.trim().toLowerCase();
       const catFilter = document.getElementById('filterCategory').value;
@@ -523,7 +541,7 @@
       renderExpenses(filtered);
     }
 
-    // คำนวณสรุปค่าใช้จ่ายยอดรวมทางการเงิน
+    // คำนวณสรุปค่าใช้จ่ายยอดรวมบนหน้าแดชบอร์ดหลัก
     function updateSummaryCards(items) {
       const total = items.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
       document.getElementById('totalBalanceText').innerText = `฿${total.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
@@ -537,7 +555,7 @@
       document.getElementById('totalCountText').innerText = `${items.length} รายการ`;
     }
 
-    // วาดกราฟวงกลมและตารางสรุปสถิติแบบ Swap แถว/คอลัมน์ (Pivot Style)
+    // อัปเดตกราฟสัดส่วนพร้อมการสรุปสถิติแบบกลับคอลัมน์กับแถว (Swapped Rows/Columns)
     function renderCategoryChart(items) {
       const donut = document.getElementById('chartDonut');
       const legendContainer = document.getElementById('chartLegendContainer');
@@ -550,7 +568,6 @@
         return;
       }
 
-      // คำนวณรายจ่ายแต่ละกลุ่ม
       const sums = {};
       let grandTotal = 0;
       items.forEach(item => {
@@ -561,39 +578,27 @@
 
       chartCenterSum.innerText = `฿${grandTotal.toLocaleString('th-TH', {maximumFractionDigits: 0})}`;
 
-      // ประมวลสัดส่วนองศาของ conic-gradient
       let accumulatedPercent = 0;
       let conicSlices = [];
 
-      // สร้างตารางข้อมูลสรุปย่อแบบแถวและคอลัมน์สลับด้านกันตามเงื่อนไขพิเศษ
-      const categories = Object.keys(sums);
+      // การจัดหมวดหมู่ในลักษณะสลับแถวคอลัมน์ (Pivot Column to Rows)
       let tableRows = `
         <table class="w-full text-xs text-left text-slate-500 dark:text-gray-400 border-collapse mt-2">
           <thead>
             <tr class="bg-slate-50 dark:bg-gray-800/40 text-slate-700 dark:text-gray-300">
-              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold">หมวดหมู่</th>
-              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center">รวมรายจ่าย</th>
-              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center">ร้อยละ (%)</th>
+              <th class="p-2 border border-slate-200 dark:border-gray-800 font-bold">หมวดหมู่ข้อมูล</th>
+              ${Object.keys(sums).map(cat => `<th class="p-2 border border-slate-200 dark:border-gray-800 font-extrabold text-center">${CATEGORY_STYLES[cat]?.emoji || '🪙'} ${cat}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
-            ${categories.map(cat => {
-              const amount = sums[cat];
-              const pct = ((amount / grandTotal) * 100).toFixed(1);
-              return `
-                <tr>
-                  <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white">
-                    ${CATEGORY_STYLES[cat]?.emoji || '🪙'} ${cat}
-                  </td>
-                  <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center text-slate-900 dark:text-white">
-                    ฿${amount.toLocaleString('th-TH', {minimumFractionDigits: 1})}
-                  </td>
-                  <td class="p-2 border border-slate-200 dark:border-gray-800 text-center font-bold text-emerald-600 dark:text-emerald-400">
-                    ${pct}%
-                  </td>
-                </tr>
-              `;
-            }).join('')}
+            <tr>
+              <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white">รวมค่าใช้จ่าย</td>
+              ${Object.keys(sums).map(cat => `<td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-center text-slate-900 dark:text-white">฿${sums[cat].toLocaleString('th-TH', {minimumFractionDigits: 1})}</td>`).join('')}
+            </tr>
+            <tr>
+              <td class="p-2 border border-slate-200 dark:border-gray-800 font-bold text-slate-800 dark:text-white">คิดเป็นร้อยละ</td>
+              ${Object.keys(sums).map(cat => `<td class="p-2 border border-slate-200 dark:border-gray-800 text-center font-bold text-emerald-600 dark:text-emerald-400">${((sums[cat]/grandTotal)*100).toFixed(1)}%</td>`).join('')}
+            </tr>
           </tbody>
         </table>
       `;
@@ -614,12 +619,12 @@
           <div class="overflow-x-auto scrollbar-hide border border-slate-200 dark:border-gray-800 rounded-2xl p-2 bg-white dark:bg-[#1A1C24]">
             ${tableRows}
           </div>
-          <p class="text-[10px] text-slate-400 dark:text-gray-500 font-semibold text-center italic">* ตารางแสดงผลสรุปแบบสลับแนวระนาบแนวตั้ง</p>
+          <p class="text-[10px] text-slate-400 dark:text-gray-500 font-semibold text-center italic">* ตารางสถิติแบบผันแปรแนวนอน (Column/Row Switched)</p>
         </div>
       `;
     }
 
-    // รับมือระบบฟอร์ม เพิ่ม / แก้ไขรายการ
+    // บันทึกหรือแก้ไขรายการ
     function handleFormSubmit(e) {
       e.preventDefault();
 
@@ -629,14 +634,14 @@
       const amount = parseFloat(document.getElementById('amountInput').value);
 
       if (!date || !category || !description || isNaN(amount)) {
-        showToast("กรอกรายละเอียดไม่สมบูรณ์", "alert-circle");
+        showToast("กรอกข้อมูลรายจ่ายไม่สมบูรณ์", "alert-circle");
         return;
       }
 
       const submitBtn = document.getElementById('submitBtn');
       const originalHtml = submitBtn.innerHTML;
       submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span class="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></span> กำลังบันทึกข้อมูล...`;
+      submitBtn.innerHTML = `<span class="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></span> กำลังเซฟข้อมูล...`;
 
       const expenseData = { date, category, description, amount };
 
@@ -653,7 +658,7 @@
           body: JSON.stringify({ action: actionType, data: expenseData })
         })
         .then(res => {
-          if (!res.ok) throw new Error("การยิงข้อมูลเซสชันหลักไม่ผ่าน");
+          if (!res.ok) throw new Error("ส่งสัญญาณเชื่อมโยงล้มเหลว");
           return res.json();
         })
         .then(resData => {
@@ -664,13 +669,13 @@
             resetForm();
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalHtml;
-            showToast(editingId ? "อัปเดตข้อมูลบนคลาวด์แล้ว!" : "เพิ่มรายการลงชีทแล้ว!", "check-circle");
+            showToast(editingId ? "อัปเดตบนคลาวด์สำเร็จ!" : "ส่งข้อมูลบันทึกลงคลาวด์สำเร็จ!", "check-circle");
             editingId = null;
           }, 1000);
         })
         .catch(err => {
           console.error(err);
-          showToast("การเชื่อมล้มเหลว: " + err.message, "alert-circle");
+          showToast("ไม่สามารถอัปเดตชีท: " + err.message, "alert-circle");
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalHtml;
         });
@@ -678,11 +683,11 @@
       } else {
         if (editingId) {
           expenses = expenses.map(item => item.id === editingId ? { ...item, ...expenseData } : item);
-          showToast("อัปเดตข้อมูลจำลองแล้ว", "check-circle");
+          showToast("แก้ไขข้อมูลทดลองเรียบร้อย", "check-circle");
         } else {
           const newId = new Date().getTime().toString();
           expenses.unshift({ id: newId, ...expenseData });
-          showToast("เพิ่มข้อมูลโหมดจำลองแล้ว", "check-circle");
+          showToast("เพิ่มข้อมูลทดลองเรียบร้อย", "check-circle");
         }
         
         localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
@@ -694,7 +699,7 @@
       }
     }
 
-    // เริ่มต้นกระบวนการแก้ไขข้อมูล
+    // เริ่มทำงานในโหมดแก้ไขข้อมูล
     function startEditMode(id, date, category, description, amount) {
       editingId = id;
       document.getElementById('dateInput').value = date;
@@ -702,20 +707,20 @@
       document.getElementById('descInput').value = description;
       document.getElementById('amountInput').value = amount;
 
-      document.getElementById('formTitle').innerHTML = `<span class="w-2 h-4 bg-blue-500 rounded"></span> แก้ไขรายการคลาวด์`;
+      document.getElementById('formTitle').innerHTML = `<span class="w-2 h-4 bg-blue-500 rounded"></span> แก้ไขรายการบันทึก`;
       document.getElementById('submitBtn').className = "w-full bg-blue-500 hover:bg-blue-600 text-white font-black text-xs py-4 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] transition-all";
-      document.getElementById('submitBtn').innerHTML = `<i data-lucide="edit-2" class="w-4 h-4"></i> อัปเดตข้อมูลรายการ`;
+      document.getElementById('submitBtn').innerHTML = `<i data-lucide="edit-2" class="w-4 h-4"></i> บันทึกข้อมูลที่แก้ไข`;
       document.getElementById('cancelEditBtn').classList.remove('hidden');
 
       window.scrollTo({ top: 120, behavior: 'smooth' });
       lucide.createIcons();
     }
 
-    // ยกเลิกสถานะแก้ไข
+    // ยกเลิกการแก้ไขข้อมูล
     function cancelEditMode() {
       resetForm();
       editingId = null;
-      showToast("ยกเลิกสถานะการแก้ไขแล้ว", "info");
+      showToast("ยกเลิกการแก้ไขข้อมูลแล้ว", "info");
     }
 
     function resetForm() {
@@ -732,7 +737,7 @@
       lucide.createIcons();
     }
 
-    // เตรียมพร้อมลบข้อมูล
+    // ดำเนินการขั้นตอนการลบข้อมูล
     function triggerDelete(id) {
       deleteIdTarget = id;
       toggleDeleteModal(true);
@@ -747,12 +752,11 @@
       }
     }
 
-    // ลบข้อมูลจริงออกจากเซสชัน
     function executeDelete() {
       if (!deleteIdTarget) return;
 
       toggleDeleteModal(false);
-      showToast("กำลังดำเนินคำขอลบ...", "loader");
+      showToast("กำลังสั่งลบข้อมูล...", "loader");
 
       if (isCloudMode) {
         fetch(webAppUrl, {
@@ -761,14 +765,14 @@
           headers: {
             'Content-Type': 'text/plain;charset=utf-8'
           },
-          body: JSON.stringify({ action: 'deleteExpense', data: { id: deleteIdTarget } })
+          body: JSON.stringify({ action: 'deleteExpense', id: deleteIdTarget })
         })
         .then(res => res.json())
         .then(resData => {
           if (resData.status === "error") throw new Error(resData.message);
           setTimeout(() => {
             fetchExpensesFromCloud();
-            showToast("ลบข้อมูลออกจาก Google Sheets แล้ว!", "trash-2");
+            showToast("ลบข้อมูลออกจาก Google Sheets สำเร็จ!", "trash-2");
           }, 1000);
         })
         .catch(err => {
@@ -778,13 +782,13 @@
         expenses = expenses.filter(item => item.id !== deleteIdTarget);
         localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
         renderDataAndStats();
-        showToast("ลบรายการจากเบราว์เซอร์แล้ว", "trash-2");
+        showToast("ลบข้อมูลในเครื่องจำลองสำเร็จ", "trash-2");
       }
 
       deleteIdTarget = null;
     }
 
-    // นำเข้าตัวแจ้งเตือนความคืบหน้าลอยฟ้า
+    // ตัวแจ้งเตือนพริ้วไหวลอยฟ้า (Toasts)
     function showToast(message, iconName = 'info') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
@@ -798,19 +802,16 @@
       container.appendChild(toast);
       lucide.createIcons();
 
-      // แอนิเมชันตอนแสดงผล
       setTimeout(() => {
         toast.classList.remove('opacity-0', 'translate-y-2');
       }, 50);
 
-      // เคลียร์ผลหลังจากพ้นระยะเวลาที่กำหนด
       setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-y-[-10px]');
         setTimeout(() => toast.remove(), 300);
       }, 3000);
     }
 
-    // ฟังก์ชันช่วยสลับการจัดการแท็บหน้าเมนูหลัก
     function switchTab(tab) {
       const tabAdd = document.getElementById('tab-add');
       const tabStats = document.getElementById('tab-stats');
@@ -830,7 +831,6 @@
       }
     }
 
-    // ฟังก์ชันฟอร์แมตจัดเรียงแปลงวันที่แบบไทยยอดนิยม
     function formatDateThai(dateStr) {
       if (!dateStr) return "";
       const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
@@ -839,7 +839,7 @@
       
       const day = parseInt(p[2]);
       const month = months[parseInt(p[1]) - 1];
-      const year = parseInt(p[0]) + 543; // แปลงพุทธศักราช
+      const year = parseInt(p[0]) + 543;
       return `${day} ${month} ${year}`;
     }
   </script>
