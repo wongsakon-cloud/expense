@@ -269,6 +269,10 @@
           </div>
         </div>
 
+        <div class="text-[10px] text-center font-bold text-slate-400 mb-2">
+          💡 แตะที่หมวดหมู่ด้านล่างเพื่อแสดงปฏิทินรายจ่าย
+        </div>
+
         <!-- รายละเอียดข้อมูลแสดงรายการสรุปผลแบบแถวแนวตั้ง (Row List) พร้อมสีและอัตราส่วนสถิติที่สอดคล้องกัน -->
         <div id="chartLegendContainer" class="space-y-2 mt-4">
           <!-- รายการคำนวณแต่ละหมวดหมู่จะสร้างผ่านฟังก์ชัน JS -->
@@ -358,6 +362,75 @@
     </div>
   </div>
 
+  <!-- หน้าต่างประวัติปฏิทินหมวดหมู่แบบการ์ดแก้วลอยพรีเมียม (Category Calendar Modal) -->
+  <div id="categoryCalendarModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-2xl transition-colors">
+      <!-- ส่วนหัวของโมดอลแสดงชื่อหมวดหมู่ที่เลือก -->
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-gray-800">
+        <div class="flex items-center gap-2">
+          <div id="calHeaderIcon" class="w-8 h-8 rounded-xl flex items-center justify-center text-sm shadow-sm">
+            <!-- Icon/Emoji -->
+          </div>
+          <div>
+            <h4 id="calHeaderTitle" class="text-xs font-extrabold text-slate-800 dark:text-white leading-tight">สถิติหมวดหมู่</h4>
+            <p id="calHeaderSubtitle" class="text-[10px] text-slate-400 font-bold mt-0.5">คลิกวันที่ล้อมรอบด้วยวงกลมเพื่อดูรายการ</p>
+          </div>
+        </div>
+        <button onclick="toggleCategoryCalendarModal(false)" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-400">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- คอนโทรลเนวิเกเตอร์ เดือน/ปี ของปฏิทิน -->
+      <div class="flex items-center justify-between px-1">
+        <button onclick="changeCalMonth(-1)" class="p-2 rounded-xl bg-slate-50 dark:bg-gray-800/60 hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 transition-all">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        </button>
+        <span id="calMonthYearText" class="text-xs font-black text-slate-800 dark:text-white">มกราคม 2567</span>
+        <button onclick="changeCalMonth(1)" class="p-2 rounded-xl bg-slate-50 dark:bg-gray-800/60 hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 transition-all">
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- ตารางปฏิทินปูพื้นฐาน -->
+      <div class="space-y-1">
+        <!-- แถวหัวสัปดาห์ (Sun-Sat) -->
+        <div class="grid grid-cols-7 text-center text-[10px] font-bold text-slate-400">
+          <div>อา.</div>
+          <div>จ.</div>
+          <div>อ.</div>
+          <div>พ.</div>
+          <div>พฤ.</div>
+          <div>ศ.</div>
+          <div>ส.</div>
+        </div>
+        <!-- ตารางวันที่จะถูกเขียนผ่าน JavaScript ดึงข้อมูลสดมาไฮไลต์อย่างงดงาม -->
+        <div id="calDaysGrid" class="grid grid-cols-7 gap-1 text-center">
+          <!-- วันที่จะถูกป้อนเข้ามาสร้างความเปลี่ยนแปลงที่นี่ -->
+        </div>
+      </div>
+
+      <!-- ส่วนแจ้งรายละเอียดของวันที่ที่ผู้ใช้ทำการเลือกดู -->
+      <div class="pt-2 border-t border-slate-100 dark:border-gray-800">
+        <div class="flex items-center justify-between mb-2">
+          <h5 id="calDetailHeader" class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+            รายละเอียดรายการวันที่เลือก
+          </h5>
+          <span id="calDetailDateBadge" class="text-[10px] font-black text-emerald-500">
+            แตะเลือกวัน
+          </span>
+        </div>
+        
+        <!-- รายการสรุปภายในวันนั้น -->
+        <div id="calDetailListContainer" class="space-y-2 max-h-40 overflow-y-auto scrollbar-hide">
+          <div class="text-center py-4 text-xs font-bold text-slate-400">
+            โปรดเลือกวันที่วงกลมสีเพื่อแสดงประวัติ
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- หน้าต่างแก้วป็อปอัปยืนยันการลบข้อมูล (Custom Modal) -->
   <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs text-center space-y-4 shadow-xl">
@@ -404,6 +477,12 @@
     let editingId = null;
     let deleteIdTarget = null;
     let selectedMonth = ""; // เก็บค่าเดือนที่เลือกในแท็บคลังประวัติ (รูปแบบ YYYY-MM)
+
+    // ตัวแปรของระบบปฏิทินสถิติรายวัน
+    let calSelectedCategory = "";
+    let calCurrentYear = new Date().getFullYear();
+    let calCurrentMonth = new Date().getMonth(); // 0-11
+    let calSelectedDayStr = ""; // "YYYY-MM-DD"
 
     // โหลดหมวดหมู่จาก localStorage อย่างถาวร
     let customCategories = JSON.parse(localStorage.getItem('expense_custom_categories')) || {};
@@ -903,13 +982,13 @@
         currentPercent = nextPercent;
         
         legendHTML += `
-          <div class="bg-slate-50 dark:bg-[#1A1C24]/60 border border-slate-100 dark:border-gray-800/40 p-3.5 rounded-2xl flex items-center justify-between shadow-sm">
+          <div onclick="openCategoryCalendar('${cat}')" class="bg-slate-50 dark:bg-[#1A1C24]/60 border border-slate-100 dark:border-gray-800/40 p-3.5 rounded-2xl flex items-center justify-between shadow-sm cursor-pointer hover:border-purple-500/40 hover:scale-[1.01] transition-all group">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0" style="background-color: ${colorHex}15; color: ${colorHex}">
                 ${style.emoji}
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-xs font-black text-slate-800 dark:text-gray-200 truncate">${cat}</p>
+                <p class="text-xs font-black text-slate-800 dark:text-gray-200 group-hover:text-purple-500 transition-colors truncate">${cat}</p>
                 <div class="flex items-center gap-2 mt-1">
                   <div class="w-16 bg-slate-200 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
                     <div class="h-full rounded-full" style="width: ${percent}%; background-color: ${colorHex}"></div>
@@ -918,8 +997,9 @@
                 </div>
               </div>
             </div>
-            <div class="text-right ml-2 flex-shrink-0">
+            <div class="text-right ml-2 flex-shrink-0 flex items-center gap-1.5">
               <p class="text-xs font-black text-slate-800 dark:text-white">฿${sumVal.toLocaleString('th-TH', {minimumFractionDigits:2})}</p>
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-300 group-hover:text-purple-500 transition-colors"></i>
             </div>
           </div>
         `;
@@ -927,6 +1007,183 @@
       
       chartDonut.style.background = `conic-gradient(${gradientSegments.join(', ')})`;
       document.getElementById('chartLegendContainer').innerHTML = legendHTML;
+      lucide.createIcons();
+    }
+
+    // ================= ระบบโมดอลปฏิทินแสดงสถิติหมวดหมู่รายวัน =================
+    function toggleCategoryCalendarModal(show) {
+      const modal = document.getElementById('categoryCalendarModal');
+      modal.classList.toggle('hidden', !show);
+    }
+
+    function openCategoryCalendar(categoryName) {
+      calSelectedCategory = categoryName;
+      
+      // ตั้งค่าปีและเดือนปฏิทินปัจจุบันให้เป็น เดือนที่มีข้อมูลล่าสุด หรือ เดือนปัจจุบัน
+      const catExpenses = expenses.filter(e => e.category === categoryName);
+      if (catExpenses.length > 0) {
+        const sorted = catExpenses.sort((a,b) => b.date.localeCompare(a.date));
+        const latestDate = new Date(sorted[0].date);
+        calCurrentYear = latestDate.getFullYear();
+        calCurrentMonth = latestDate.getMonth();
+      } else {
+        const now = new Date();
+        calCurrentYear = now.getFullYear();
+        calCurrentMonth = now.getMonth();
+      }
+      
+      calSelectedDayStr = ""; // ล้างค่าวันทีเลือกเดิมออกก่อน
+      
+      // อัปเดตส่วนหัวของ Modal
+      const style = CATEGORY_STYLES[categoryName] || CATEGORY_STYLES["อื่นๆ"];
+      const headerIcon = document.getElementById('calHeaderIcon');
+      headerIcon.innerText = style.emoji;
+      headerIcon.style.backgroundColor = `${style.hex}15`;
+      headerIcon.style.color = style.hex;
+      
+      document.getElementById('calHeaderTitle').innerText = `ปฏิทินรายจ่าย: ${categoryName}`;
+      
+      renderCalendar();
+      toggleCategoryCalendarModal(true);
+    }
+
+    function changeCalMonth(direction) {
+      calCurrentMonth += direction;
+      if (calCurrentMonth < 0) {
+        calCurrentMonth = 11;
+        calCurrentYear--;
+      } else if (calCurrentMonth > 11) {
+        calCurrentMonth = 0;
+        calCurrentYear++;
+      }
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const thaiMonths = [
+        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+      ];
+      
+      // อัปเดตข้อความหัวเดือน/ปีในไทยพุทธศักราช
+      document.getElementById('calMonthYearText').innerText = `${thaiMonths[calCurrentMonth]} ${calCurrentYear + 543}`;
+      
+      const gridContainer = document.getElementById('calDaysGrid');
+      gridContainer.innerHTML = "";
+      
+      // วันแรกของเดือน (0 = วันอาทิตย์)
+      const firstDayIndex = new Date(calCurrentYear, calCurrentMonth, 1).getDay();
+      
+      // จำนวนวันทั้งหมดในเดือนนั้น ๆ
+      const totalDays = new Date(calCurrentYear, calCurrentMonth + 1, 0).getDate();
+      
+      // สร้างช่องว่างก่อนวันแรกของสัปดาห์
+      let dayCellsHTML = "";
+      for (let i = 0; i < firstDayIndex; i++) {
+        dayCellsHTML += `<div class="h-8"></div>`;
+      }
+      
+      // สกัดสไตล์และค่าหมวดหมู่
+      const style = CATEGORY_STYLES[calSelectedCategory] || CATEGORY_STYLES["อื่นๆ"];
+      const colorHex = style.hex || "#10b981";
+      
+      // ดึงประวัติข้อมูลเฉพาะหมวดหมู่ที่เลือกเพื่อระบุวันที่มีการบันทึก
+      const catExpenses = expenses.filter(e => e.category === calSelectedCategory);
+      
+      // ลูปเขียนปฏิทิน
+      for (let day = 1; day <= totalDays; day++) {
+        const dayStr = `${calCurrentYear}-${String(calCurrentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        // ตรวจสอบว่าวันนี้มีรายการจ่ายเงินของหมวดนี้หรือไม่
+        const hasExpenses = catExpenses.some(e => e.date === dayStr);
+        const isSelected = calSelectedDayStr === dayStr;
+        
+        let borderStyle = "";
+        let textStyle = "text-slate-700 dark:text-gray-300";
+        let hoverStyle = "hover:bg-slate-100 dark:hover:bg-gray-800/50";
+        
+        if (hasExpenses) {
+          // หากมีข้อมูลรายจ่าย ล้อมรอบด้วยขอบวงกลมหนาตามรหัสสีประจำหมวดหมู่
+          borderStyle = `border-2`;
+          hoverStyle = "hover:bg-slate-50 dark:hover:bg-[#1c202a]";
+        }
+        
+        if (isSelected) {
+          // สีพื้นหลังเต็มวงกลมกรณีเลือกวันนั้น ๆ
+          textStyle = `text-white font-black`;
+        }
+        
+        // สไตล์วงกลมครอบ
+        const inlineStyle = `
+          border-color: ${hasExpenses ? colorHex : 'transparent'};
+          background-color: ${isSelected ? colorHex : 'transparent'};
+        `;
+        
+        dayCellsHTML += `
+          <button onclick="selectCalendarDay('${dayStr}')" 
+                  style="${inlineStyle}" 
+                  class="h-8 w-8 mx-auto rounded-full flex items-center justify-center text-[11px] font-bold ${borderStyle} ${textStyle} ${hoverStyle} transition-all">
+            ${day}
+          </button>
+        `;
+      }
+      
+      gridContainer.innerHTML = dayCellsHTML;
+      
+      // อัปเดตตารางสรุปรายการด้านล่าง
+      updateCalendarDetailsSection();
+    }
+
+    function selectCalendarDay(dayStr) {
+      calSelectedDayStr = dayStr;
+      renderCalendar(); // เพื่อวาดไฮไลต์การเลือกสีใหม่
+    }
+
+    function updateCalendarDetailsSection() {
+      const listContainer = document.getElementById('calDetailListContainer');
+      const badge = document.getElementById('calDetailDateBadge');
+      
+      if (!calSelectedDayStr) {
+        badge.innerText = "แตะเลือกวันที่มีวงสี";
+        badge.className = "text-[10px] font-black text-slate-400";
+        listContainer.innerHTML = `
+          <div class="text-center py-6 text-xs font-bold text-slate-400 flex flex-col items-center gap-1">
+            <i data-lucide="info" class="w-4 h-4 text-slate-300"></i>
+            คลิกวันที่วงกลมสีบนปฏิทินเพื่อดูบันทึก
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+      
+      // อัปเดตหัววันที่ไทย
+      badge.innerText = formatDateThai(calSelectedDayStr);
+      badge.className = "text-[10px] font-black text-purple-500";
+      
+      // กรองรายการของหมวดหมู่และวันทีเลือก
+      const dayExpenses = expenses.filter(e => e.category === calSelectedCategory && e.date === calSelectedDayStr);
+      
+      if (dayExpenses.length === 0) {
+        listContainer.innerHTML = `
+          <div class="text-center py-6 text-xs font-bold text-slate-400">
+            ไม่มีรายการบันทึกของหมวดหมู่นี้ในวันนี้
+          </div>`;
+        return;
+      }
+      
+      // วาดแถวรายละเอียดข้อมูล
+      listContainer.innerHTML = dayExpenses.map(e => {
+        const amt = parseFloat(e.amount) || 0;
+        return `
+          <div class="bg-slate-50 dark:bg-gray-800/40 border border-slate-100 dark:border-gray-800 p-2.5 rounded-xl flex items-center justify-between text-xs transition-all">
+            <div class="min-w-0 pr-2">
+              <p class="font-black text-slate-800 dark:text-gray-100 truncate">${e.description}</p>
+            </div>
+            <span class="font-black text-rose-500 dark:text-rose-400 flex-shrink-0">
+              ฿${amt.toLocaleString('th-TH', {minimumFractionDigits:2})}
+            </span>
+          </div>
+        `;
+      }).join('');
     }
 
     // ================= ระบบสลับแท็บเมนูการใช้งาน =================
