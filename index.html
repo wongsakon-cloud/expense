@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>แอปบันทึกและเบิกจ่ายเงิน (Cloud Sync)</title>
   
+  <!-- นำเข้าทรัพยากรการแสดงผลที่จำเป็นเพื่อความเสถียรเมื่อรันบน GitHub -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -45,6 +46,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-[#0D0F14] dark:text-gray-100 min-h-screen font-sans flex flex-col pb-12">
 
+  <!-- ส่วนหัวเว็บ (Header) -->
   <header class="sticky top-0 z-30 bg-white/80 dark:bg-[#0D0F14]/80 backdrop-blur-md border-b border-slate-200/50 dark:border-gray-800/50 px-4 py-3 transition-colors">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2">
@@ -61,6 +63,7 @@
       </div>
       
       <div class="flex items-center gap-2">
+        <!-- ปุ่มเปิดปิดโหมดมืด -->
         <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all">
           <i id="themeIcon" data-lucide="sun" class="w-4 h-4"></i>
         </button>
@@ -68,8 +71,10 @@
     </div>
   </header>
 
+  <!-- เนื้อหาหลักของแอปพลิเคชัน -->
   <main class="flex-1 w-full max-w-md mx-auto px-4 mt-6">
     
+    <!-- แดชบอร์ดสรุปยอดเงินแบบการ์ดแก้วพรีเมียม -->
     <section class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden mb-6">
       <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
       <div class="absolute -left-10 -top-10 w-32 h-32 bg-teal-400/20 rounded-full blur-xl"></div>
@@ -89,6 +94,7 @@
       </div>
     </section>
 
+    <!-- แท็บเมนูสลับหน้าจอการทำงาน (3 แท็บ) -->
     <div class="flex bg-slate-100 dark:bg-gray-800 p-1.5 rounded-2xl mb-6">
       <button id="tab-add" onclick="switchTab('add')" class="flex-1 py-3 text-[11px] font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm">
         <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> บันทึก
@@ -101,7 +107,9 @@
       </button>
     </div>
 
+    <!-- ส่วนที่ 1: แท็บบันทึก (แสดงฟอร์ม และรายการล่าสุดแค่ 5 รายการ) -->
     <div id="content-add" class="space-y-6">
+      <!-- ฟอร์มกรอกบันทึกข้อมูลหลัก -->
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm transition-colors">
         <div class="flex items-center justify-between mb-4">
           <h3 id="formTitle" class="text-sm font-extrabold flex items-center gap-2">
@@ -119,8 +127,11 @@
             <div>
               <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">หมวดหมู่</label>
               <div class="flex gap-2">
+                <!-- Dropdown หมวดหมู่ ถูกสร้างผ่าน JS โดยจะแยก 'อื่นๆ' ให้อยู่ล่างสุดเสมอ -->
                 <select id="categoryInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-[11px] font-bold outline-none focus:border-emerald-500 transition-all">
-                  </select>
+                  <!-- JS จะเติมข้อมูลอัตโนมัติ -->
+                </select>
+                <!-- ปุ่มเพิ่มหมวดหมู่ -->
                 <button type="button" onclick="toggleAddCategoryModal(true)" class="bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-gray-700 w-11 flex-shrink-0 rounded-xl flex items-center justify-center transition-colors">
                   <i data-lucide="plus" class="w-4 h-4"></i>
                 </button>
@@ -147,6 +158,7 @@
         </form>
       </section>
 
+      <!-- ประวัติรายการล่าสุด (5 รายการ) -->
       <section class="space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-extrabold flex items-center gap-2">
@@ -155,25 +167,32 @@
           <button onclick="switchTab('history')" class="text-[10px] text-emerald-500 hover:underline font-bold">ดูทั้งหมด &rarr;</button>
         </div>
 
+        <!-- โหลดเดอร์แอนิเมชันสำหรับบอกสถานะการเชื่อมต่อ -->
         <div id="loadingIndicatorAdd" class="hidden bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800/50 p-8 rounded-3xl text-center space-y-3">
           <div class="w-8 h-8 rounded-full border-3 border-emerald-500 border-t-transparent animate-spin mx-auto"></div>
           <p class="text-xs text-slate-500 dark:text-gray-400 font-bold animate-pulse-soft">กำลังดึงฐานข้อมูลคลาวด์...</p>
         </div>
 
+        <!-- โหนดแสดงรายการผลลัพธ์ (5 รายการ) -->
         <div id="recentExpensesContainer" class="space-y-2">
-          </div>
+          <!-- จะนำเข้าประวัติผ่านการ Render ฝั่ง JavaScript -->
+        </div>
       </section>
     </div>
 
+    <!-- ส่วนที่ 2: แท็บคลังประวัติ (แยกย่อยตามเดือน) -->
     <div id="content-history" class="hidden space-y-4">
       
+      <!-- เมนูชิปรายเดือน (แนวนอน) -->
       <div class="relative">
         <div class="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-slate-50 dark:from-[#0D0F14] to-transparent z-10 pointer-events-none"></div>
         <div class="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-slate-50 dark:from-[#0D0F14] to-transparent z-10 pointer-events-none"></div>
         <div id="monthChipsContainer" class="flex gap-2 overflow-x-auto scrollbar-hide py-1 px-1">
-          </div>
+          <!-- แถบรายเดือนจะถูกป้อนผ่าน JS -->
+        </div>
       </div>
 
+      <!-- สรุปของเดือนที่เลือก -->
       <div class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-4 rounded-3xl flex items-center justify-between shadow-sm">
         <div>
           <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">รวมรายจ่ายเดือนนี้</p>
@@ -185,21 +204,27 @@
         </div>
       </div>
 
+      <!-- ตัวกรองการแสดงผลและค้นหาในคลังประวัติ -->
       <div class="flex gap-2 mb-2">
         <div class="relative flex-1">
           <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
           <input type="text" id="searchInput" oninput="filterHistory()" placeholder="ค้นหาในเดือนนี้..." class="w-full bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none focus:border-emerald-500 transition-all shadow-sm">
         </div>
         <select id="filterCategory" onchange="filterHistory()" class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl px-3 text-xs font-bold outline-none shadow-sm">
-          </select>
+          <!-- จะนำเข้าหมวดหมู่ผ่าน JS -->
+        </select>
       </div>
 
+      <!-- โหนดแสดงรายการผลลัพธ์ในเดือนนั้นๆ -->
       <div id="historyExpensesContainer" class="space-y-2 pb-4">
-        </div>
+        <!-- จะนำเข้าประวัติผ่านการ Render ฝั่ง JavaScript -->
+      </div>
     </div>
 
+    <!-- ส่วนที่ 3: แท็บแผนภูมิสถิติรายจ่าย -->
     <div id="content-stats" class="hidden space-y-4">
       
+      <!-- ส่วนกล่องเครื่องมือฟิลเตอร์กรองสถิติแบบระบุเงื่อนไข -->
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-4 rounded-3xl shadow-sm space-y-3">
         <div class="flex items-center justify-between">
           <h4 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -212,7 +237,8 @@
           <div>
             <label class="text-[10px] font-bold text-slate-400 block mb-1">หมวดหมู่</label>
             <select id="statsFilterCategory" onchange="renderStatsView()" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-purple-500 transition-all">
-              </select>
+              <!-- ป้อนข้อมูลอัตโนมัติผ่าน JavaScript -->
+            </select>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
@@ -227,11 +253,13 @@
         </div>
       </section>
 
+      <!-- บล็อกแสดงผลกราฟวงกลมและรายงานกลุ่มหมวดหมู่ -->
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm">
         <h3 class="text-sm font-extrabold flex items-center gap-2 mb-4">
           <span class="w-2 h-4 bg-purple-500 rounded"></span> สัดส่วนรายจ่ายตามหมวดหมู่
         </h3>
 
+        <!-- กราฟวงกลมจำลองด้วย SVG & conic-gradient -->
         <div class="flex flex-col items-center justify-center py-4">
           <div id="chartDonut" class="w-44 h-44 rounded-full shadow-inner relative flex items-center justify-center transition-all duration-500" style="background: conic-gradient(#e2e8f0 0% 100%)">
             <div class="w-32 h-32 bg-white dark:bg-[#13151C] rounded-full flex flex-col items-center justify-center shadow-md">
@@ -241,13 +269,16 @@
           </div>
         </div>
 
+        <!-- รายละเอียดข้อมูลแสดงรายการสรุปผลแบบแถวแนวตั้ง (Row List) พร้อมสีและอัตราส่วนสถิติที่สอดคล้องกัน -->
         <div id="chartLegendContainer" class="space-y-2 mt-4">
-          </div>
+          <!-- รายการคำนวณแต่ละหมวดหมู่จะสร้างผ่านฟังก์ชัน JS -->
+        </div>
       </section>
     </div>
 
   </main>
 
+  <!-- หน้าต่างเพิ่มหมวดหมู่ (Custom Add Category Modal) -->
   <div id="addCategoryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs space-y-4 shadow-xl">
       <div class="flex items-center justify-between mb-2">
@@ -293,6 +324,7 @@
     </div>
   </div>
 
+  <!-- หน้าต่างยืนยันการลบข้อมูล (Custom Modal) -->
   <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs text-center space-y-4 shadow-xl">
       <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/30 rounded-2xl flex items-center justify-center mx-auto text-rose-500">
@@ -309,17 +341,19 @@
     </div>
   </div>
 
+  <!-- ระบบป็อปอัปแจ้งเตือนลอยพริ้วไหว (Floating Toasts Manager) -->
   <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+  <!-- ----------------- ส่วนระบบควบคุมโปรแกรมหลักผ่านสคริปต์ JavaScript ----------------- -->
   <script>
     const DEMO_KEY = "expense_tracker_demo_data";
     const MOCK_EXPENSES = [
-      { id: "1", date: new Date().toISOString().split('T')[0], category: "อาหาร", description: "อาหารมื้อกลางวันยอดฮิต", amount: 120 },
+      { id: "1", date: new Date().toISOString().split('T')[0], category: "อาหาร", description: "อาหารมื้อกลางวัน", amount: 120 },
       { id: "2", date: new Date().toISOString().split('T')[0], category: "เดินทาง", description: "ค่าน้ำมันรถยนต์สำหรับการทำงาน", amount: 500 },
       { id: "3", date: new Date().toISOString().split('T')[0], category: "ค่าบริการ", description: "บิลค่าน้ำและไฟฟ้าสำนักงาน", amount: 1450.50 }
     ];
 
-    // หมวดหมู่ดั้งเดิมพื้นฐาน
+    // หมวดหมู่ดั้งเดิมพื้นฐาน (สีถูกอิงตามระบบ HEX เป็นหลักในการไล่ระดับ Donut และ List)
     const DEFAULT_CATEGORIES = {
       "อาหาร": { emoji: "🍱", color: "from-amber-400 to-orange-500", hex: "#f59e0b" },
       "เดินทาง": { emoji: "🚗", color: "from-blue-400 to-indigo-500", hex: "#3b82f6" },
@@ -337,7 +371,7 @@
     let deleteIdTarget = null;
     let selectedMonth = ""; // เก็บค่าเดือนที่เลือกในแท็บคลังประวัติ (รูปแบบ YYYY-MM)
 
-    // โหลดหมวดหมู่ที่ผู้ใช้สร้างเองจาก localStorage
+    // โหลดหมวดหมู่จาก localStorage อย่างถาวร
     let customCategories = JSON.parse(localStorage.getItem('expense_custom_categories')) || {};
     let CATEGORY_STYLES = { ...DEFAULT_CATEGORIES, ...customCategories };
 
@@ -345,7 +379,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
       setDefaultStatsDates(); // ตั้งค่าช่วงวันที่เริ่มต้นของหน้าสถิติเป็นเดือนปัจจุบัน
-      populateCategorySelects(); // เรนเดอร์ Dropdown ใหม่ทุกครั้งที่มีการอัปเดต
+      populateCategorySelects(); // เรนเดอร์ Dropdown หมวดหมู่ (โดยเอา 'อื่นๆ' ไว้ล่างสุดเสมอ)
       
       updateStatusBadge(true, "เชื่อมคลาวด์สด");
       fetchExpensesFromCloud();
@@ -377,27 +411,27 @@
     function updateStatusBadge(active, text) {
       const badge = document.getElementById('syncStatusBadge');
       const badgeText = document.getElementById('syncStatusText');
-      const noticeAdd = document.getElementById('localDataNotice');
 
       const bgClass = active ? "bg-emerald-500" : "bg-amber-500";
       badge.className = `w-2 h-2 rounded-full ${bgClass} animate-pulse`;
       badgeText.innerText = text;
-      
-      if(noticeAdd) {
-        noticeAdd.innerText = active ? "คลาวด์ Google Sheet" : "โหมดทดลองเซฟในเครื่อง";
-        noticeAdd.className = active ? "text-[10px] bg-emerald-100 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full font-bold text-emerald-600 dark:text-emerald-400" : "text-[10px] bg-amber-100 dark:bg-amber-950/40 px-2.5 py-1 rounded-full font-bold text-amber-600 dark:text-amber-400";
-      }
     }
 
-    // ฟังก์ชันตั้งค่าเริ่มต้นให้ช่องระบุวันที่ของหน้าสถิติเป็น "ทุกยอดของเดือนปัจจุบัน"
+    // ฟังก์ชันตั้งค่าเริ่มต้นให้ช่วงเวลาของหน้าสถิติเป็น "ทุกยอดของเดือนปัจจุบัน"
     function setDefaultStatsDates() {
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
-      const todayStr = now.toISOString().split('T')[0];
       
-      document.getElementById('statsStartDate').value = `${year}-${month}-01`;
-      document.getElementById('statsEndDate').value = todayStr;
+      // วันแรกของเดือนปัจจุบัน
+      const startOfMonth = `${year}-${month}-01`;
+      
+      // วันสุดท้ายของเดือนปัจจุบันแบบไดนามิก
+      const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
+      const endOfMonth = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+      
+      document.getElementById('statsStartDate').value = startOfMonth;
+      document.getElementById('statsEndDate').value = endOfMonth;
     }
 
     // รีเซ็ตการกรองหน้าสถิติกลับเป็นค่าเริ่มต้น
@@ -408,34 +442,27 @@
       showToast("รีเซ็ตตัวกรองสถิติแล้ว", "sliders-horizontal");
     }
 
-    // ================= ระบบจัดการหมวดหมู่ =================
+    // ================= ระบบจัดการหมวดหมู่ (อื่นๆ ล่างสุดเสมอ) =================
     function populateCategorySelects() {
       const catInput = document.getElementById('categoryInput');
       const filterInput = document.getElementById('filterCategory');
       const statsFilterInput = document.getElementById('statsFilterCategory');
       
       let optionsHTML = '';
-      let filterHTML = '<option value="ทั้งหมด">ทุกหมวดหมู่</option>';
-      let statsFilterHTML = '<option value="ทั้งหมด">ทุกหมวดหมู่</option>';
       
-      // ดึงคีย์ทั้งหมดมา แต่เอา "อื่นๆ" ออกก่อน
+      // ดึงคีย์ทั้งหมดมา แต่ยกเว้นคีย์ "อื่นๆ" เพื่อนำไปจัดคิวลงทีหลังสุด
       const keys = Object.keys(CATEGORY_STYLES).filter(k => k !== 'อื่นๆ');
       keys.forEach(k => {
-        const str = `<option value="${k}">${CATEGORY_STYLES[k].emoji} ${k}</option>`;
-        optionsHTML += str;
-        filterHTML += str;
-        statsFilterHTML += str;
+        optionsHTML += `<option value="${k}">${CATEGORY_STYLES[k].emoji} ${k}</option>`;
       });
       
-      // ดัน "อื่นๆ" ให้ต่อท้ายสุดเสมอ
+      // แปะ "อื่นๆ" ปิดท้ายที่ล่างสุดเสมอตามเงื่อนไข
       const othersOption = `<option value="อื่นๆ">${CATEGORY_STYLES['อื่นๆ'].emoji} อื่นๆ</option>`;
       optionsHTML += othersOption;
-      filterHTML += othersOption;
-      statsFilterHTML += othersOption;
       
       if(catInput) catInput.innerHTML = optionsHTML;
-      if(filterInput) filterInput.innerHTML = filterHTML;
-      if(statsFilterInput) statsFilterInput.innerHTML = statsFilterHTML;
+      if(filterInput) filterInput.innerHTML = '<option value="ทั้งหมด">ทุกหมวดหมู่</option>' + optionsHTML;
+      if(statsFilterInput) statsFilterInput.innerHTML = '<option value="ทั้งหมด">ทุกหมวดหมู่</option>' + optionsHTML;
     }
 
     function toggleAddCategoryModal(show) {
@@ -460,8 +487,8 @@
         return;
       }
 
-      // บันทึกและรวมสไตล์ใหม่
-      customCategories[name] = { emoji: emoji, color: "bg-slate-200", hex: hex };
+      // ทำการสร้างและบันทึกใน LocalStorage อย่างถาวรไม่หายเมื่อรีเฟรช
+      customCategories[name] = { emoji: emoji, color: "from-slate-200 to-slate-300", hex: hex };
       CATEGORY_STYLES = { ...DEFAULT_CATEGORIES, ...customCategories };
       localStorage.setItem('expense_custom_categories', JSON.stringify(customCategories));
       
@@ -470,7 +497,7 @@
       
       document.getElementById('categoryInput').value = name;
       showToast("สร้างหมวดหมู่ใหม่สำเร็จ!", "check-circle");
-      renderStatsView(); // อัปเดตหน้าสถิติเพื่อให้ข้อมูลหมวดหมู่ใหม่เข้าไปคำนวณด้วย
+      renderStatsView(); // เรียกอัปเดตสถิติทันทีเผื่อมีการใช้งานข้อมูลใหม่
     }
 
     // ================= ระบบดึงข้อมูลคลาวด์ =================
@@ -514,15 +541,11 @@
       });
     }
 
-    // ================= ระบบ Render หน้าจอหลัก =================
+    // ================= ระบบ Render หน้าจอหลักและการคำนวณสถิติ =================
     function renderDataAndStats() {
-      // หน้า 1: เรนเดอร์ประวัติล่าสุด 5 อันดับแรก
       renderRecentExpenses();
-      
-      // คำนวณแดชบอร์ดด้านบนสุด
       calculateGlobalDashboard();
       
-      // หน้า 2-3: ดึงระบบประวัติและสถิติตามเวลาจริง
       if(!selectedMonth && expenses.length > 0) {
         const sorted = [...expenses].sort((a,b) => b.date.localeCompare(a.date));
         selectedMonth = sorted[0].date.substring(0,7); 
@@ -594,7 +617,7 @@
       `;
     }
 
-    // ================= ระบบประวัติแยกรายเดือน =================
+    // ================= ระบบคลังประวัติ =================
     function renderMonthlyChips() {
       const container = document.getElementById('monthChipsContainer');
       if(!container) return;
@@ -608,7 +631,6 @@
       monthsSet.add(currentYearMonth);
       
       const sortedMonths = Array.from(monthsSet).sort((a,b) => b.localeCompare(a));
-      
       const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
       
       container.innerHTML = sortedMonths.map(m => {
@@ -660,7 +682,7 @@
       }
       
       if(items.length === 0) {
-        container.innerHTML = `<div class="bg-white dark:bg-[#13151C] border border-dashed border-slate-200 dark:border-gray-800 p-12 rounded-3xl text-center text-xs text-slate-400 font-medium">ไม่พบผลลัพธ์ประวัติรายการที่ตรงเงื่อนไข</div>`;
+        container.innerHTML = `<div class="bg-white dark:bg-[#13151C] border border-dashed border-slate-200 dark:border-gray-800 p-12 rounded-3xl text-center text-xs text-slate-400 font-medium">ไม่พบรายการที่ต้องการค้นหา</div>`;
         return;
       }
       
@@ -669,13 +691,13 @@
       lucide.createIcons();
     }
 
-    // ================= ระบบการคำนวณและแสดงผลหน้าสถิติใหม่ (อัปเดตแกนกรอง) =================
+    // ================= ระบบคำนวณและแสดงผลหน้าสถิติแบบยืดหยุ่น (Color-Matched Donut & List) =================
     function renderStatsView() {
       const catFilter = document.getElementById('statsFilterCategory').value;
       const startDate = document.getElementById('statsStartDate').value;
       const endDate = document.getElementById('statsEndDate').value;
       
-      // สกัดกรองข้อมูลตามวันและกลุ่มหมวดหมู่ที่เลือก
+      // กรองข้อมูลรายการตามฟิลเตอร์วันที่และหมวดหมู่ที่เลือกอย่างแม่นยำ
       let filtered = [...expenses];
       
       if (startDate) {
@@ -688,7 +710,7 @@
         filtered = filtered.filter(e => e.category === catFilter);
       }
       
-      // ทำการจัดกลุ่มสรุปผล
+      // จัดกลุ่มสรุปยอดรวมของแต่ละหมวดหมู่
       const statsMap = {};
       let totalFilteredSum = 0;
       
@@ -698,27 +720,28 @@
         statsMap[e.category] = (statsMap[e.category] || 0) + amt;
       });
       
-      // แสดงยอดรวมศูนย์กลางกราฟ
+      // แสดงผลยอดรวมตรงกลางชาร์ต
       document.getElementById('chartCenterSum').innerText = `฿${totalFilteredSum.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
       
-      // อัปเดตโครงสร้างสีสัดส่วน Conic Gradient วงกลม
       const chartDonut = document.getElementById('chartDonut');
+      
+      // กรณีไม่มีข้อมูลสอดคล้องตามตัวกรอง
       if (totalFilteredSum === 0) {
         chartDonut.style.background = `conic-gradient(#e2e8f0 0% 100%)`;
         document.getElementById('chartLegendContainer').innerHTML = `
-          <div class="bg-slate-50 dark:bg-[#1A1C24] p-6 rounded-2xl text-center text-xs font-bold text-slate-400">
-            ไม่มีข้อมูลค่าใช้จ่ายตามเงื่อนไขตัวกรองที่เลือก
+          <div class="bg-slate-50 dark:bg-[#1A1C24] p-8 rounded-2xl text-center text-xs font-bold text-slate-400">
+            ไม่มีข้อมูลค่าใช้จ่ายตามเงื่อนไขที่เลือก
           </div>`;
         return;
       }
       
-      // สร้าง Layout สถิติและแถบสีสะสมวงกลม
+      // จัดทำสัดส่วนสี Donut อ้างอิงตามค่า Hex สีจริงของหมวดหมู่อย่างต่อเนื่อง
       let gradientSegments = [];
       let currentPercent = 0;
       let legendHTML = '';
       
-      // ดึงสไตล์เรียงลำดับจากหมวดหมู่ที่มีค่าใช้จ่ายมากที่สุดไปหาน้อยที่สุด
-      const sortedStats = Object.keys(statsMap).sort((a,b) => statsMap[b] - statsMap[a]);
+      // เรียงลำดับหมวดหมู่จากยอดใช้จ่ายมากที่สุดไปหาน้อยที่สุด
+      const sortedStats = Object.keys(statsMap).sort((a, b) => statsMap[b] - statsMap[a]);
       
       sortedStats.forEach(cat => {
         const sumVal = statsMap[cat];
@@ -730,19 +753,25 @@
         gradientSegments.push(`${colorHex} ${currentPercent}% ${nextPercent}%`);
         currentPercent = nextPercent;
         
-        // ออกแบบตารางสถิติใหม่แนวตั้ง (Row-based Card Layout) แทนแบบตารางผันแปรแนวนอนเดิมเพื่อความสวยงามประณีต
+        // เรนเดอร์การ์ดแถวสถิติ (Row-based) สอดคล้องกับสีประจำหมวดหมู่
         legendHTML += `
-          <div class="bg-slate-50 dark:bg-[#1A1C24]/60 border border-slate-100 dark:border-gray-800/40 p-3 rounded-2xl flex items-center justify-between shadow-sm">
-            <div class="flex items-center gap-2.5 min-w-0">
+          <div class="bg-slate-50 dark:bg-[#1A1C24]/60 border border-slate-100 dark:border-gray-800/40 p-3.5 rounded-2xl flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3 min-w-0">
               <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0" style="background-color: ${colorHex}15; color: ${colorHex}">
                 ${style.emoji}
               </div>
-              <div class="min-w-0">
+              <div class="min-w-0 flex-1">
                 <p class="text-xs font-black text-slate-800 dark:text-gray-200 truncate">${cat}</p>
-                <p class="text-[10px] text-slate-400 font-bold mt-0.5">${percent.toFixed(1)}% ของทั้งหมด</p>
+                <div class="flex items-center gap-2 mt-1">
+                  <!-- แถบเปอร์เซ็นต์สีประจำหมวดหมู่ -->
+                  <div class="w-16 bg-slate-200 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full" style="width: ${percent}%; background-color: ${colorHex}"></div>
+                  </div>
+                  <span class="text-[10px] text-slate-400 dark:text-gray-500 font-bold">${percent.toFixed(1)}%</span>
+                </div>
               </div>
             </div>
-            <div class="text-right flex-shrink-0">
+            <div class="text-right ml-2 flex-shrink-0">
               <p class="text-xs font-black text-slate-800 dark:text-white">฿${sumVal.toLocaleString('th-TH', {minimumFractionDigits:2})}</p>
             </div>
           </div>
@@ -815,7 +844,7 @@
             body: JSON.stringify({ id: editingId, date, category, description, amount })
           })
           .then(res => res.json())
-          .then(resData => {
+          .then(() => {
             fetchExpensesFromCloud();
             cancelEditMode();
           })
@@ -827,7 +856,7 @@
           localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
           renderDataAndStats();
           cancelEditMode();
-          showToast("แก้ไขข้อมูลในเครื่องสำเร็จ", "check");
+          showToast("แก้ไขข้อมูลสำเร็จ", "check");
         }
         
       } else {
@@ -845,7 +874,7 @@
             body: JSON.stringify(newExpense)
           })
           .then(res => res.json())
-          .then(resData => {
+          .then(() => {
             fetchExpensesFromCloud();
             resetFormInputs();
           })
@@ -857,7 +886,7 @@
           localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
           renderDataAndStats();
           resetFormInputs();
-          showToast("บันทึกข้อมูลในเครื่องเรียบร้อย", "check");
+          showToast("บันทึกข้อมูลเรียบร้อย", "check");
         }
       }
     }
@@ -935,11 +964,11 @@
         localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
         renderDataAndStats();
         toggleDeleteModal(false);
-        showToast("ลบรายการออกจากเครื่องแล้ว", "trash");
+        showToast("ลบรายการเรียบร้อย", "trash");
       }
     }
 
-    // ================= ระบบแสดง Toast แจ้งเตือนลอยพริ้วไหว =================
+    // ================= ระบบแสดง Toast แจ้งเตือน =================
     function showToast(message, iconName = "info") {
       const container = document.getElementById('toastContainer');
       if(!container) return;
