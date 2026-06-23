@@ -404,7 +404,7 @@
     let isCloudMode = true; 
     
     // ตั้งค่า URL สำหรับการ Deploy Google Apps Script ของคุณโดยตรง
-    let webAppUrl = "https://script.google.com/macros/s/AKfycbwJx7hNOqD00CqPZ8GNm6Xpa_ACtuqpiq6KH47DDxifvgJJdO80Hq-HApjyzN0GIOFU/exec"; 
+    let webAppUrl = "https://script.google.com/macros/s/AKfycbysVicVEOU7T8FRKh1nO-wMakLNj4h5b9vyrNQcj9jnpMJ7txxOL8_NWAAlJ3gOwNkP/exec"; 
     
     let editingId = null;
     let deleteIdTarget = null;
@@ -634,7 +634,7 @@
       renderDataAndStats();
     }
 
-    // แก้ไขฟังก์ชันดึงข้อมูลให้ยิงแบบ POST ด้วย text/plain เพื่อป้องกันสิทธิ์ CORS บล็อกสัญญาณ
+    // ปรับแต่งการยิง POST ด้วย fetch โดยตัด headers ซับซ้อน เพื่อส่งเป็นคำขอแบบ Simple Request ที่แก้เรื่อง CORS ได้เสถียรที่สุด
     function fetchExpensesFromCloud() {
       const addLoader = document.getElementById('loadingIndicatorAdd');
       if (addLoader) addLoader.classList.remove('hidden');
@@ -643,9 +643,6 @@
       fetch(webAppUrl, {
         method: 'POST',
         mode: 'cors',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8'
-        },
         body: JSON.stringify({
           action: 'getExpenses',
           data: {}
@@ -656,7 +653,6 @@
         return res.json();
       })
       .then(resData => {
-        // แบ็กเอนด์ของ doPost จะห่อข้อมูลผลลัพธ์ไว้ที่ data ของออบเจกต์ หรือส่งแบบอาเรย์โดยตรง
         let rawItems = [];
         if (resData && resData.status === 'success') {
           rawItems = resData.data;
@@ -1040,7 +1036,7 @@
       return `${parseInt(p[2])} ${months[parseInt(p[1]) - 1]} ${parseInt(p[0]) + 543}`;
     }
 
-    // ฟังก์ชันจัดการเพิ่ม/แก้ไขรายการเบิกจ่าย ส่งแบบ POST พร้อม CORS Guardrail เพื่อป้องกันปัญหา "ดึงข้อมูลไม่ได้"
+    // ฟังก์ชันจัดการเพิ่ม/แก้ไขรายการเบิกจ่าย ส่งแบบ POST และไม่ตั้งค่า Headers ป้องกันการติด Preflight CORS
     function handleFormSubmit(e) {
       e.preventDefault();
       
@@ -1069,7 +1065,6 @@
           fetch(webAppUrl, {
             method: 'POST',
             mode: 'cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
               action: "updateExpense",
               data: { id: editingId, date, category, description, amount }
@@ -1109,7 +1104,6 @@
           fetch(webAppUrl, {
             method: 'POST',
             mode: 'cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
               action: "addExpense",
               data: { date, category, description, amount }
@@ -1185,7 +1179,7 @@
       }
     }
 
-    // ปรับปรุงฟังก์ชันลบข้อมูลส่งแบบ POST เพื่อลดปัญหา CORS Preflight
+    // ฟังก์ชันลบข้อมูลส่งแบบ POST และไม่ตั้งค่า Headers ป้องกันการติด Preflight CORS
     function executeDeleteExpense() {
       if(!deleteIdTarget) return;
       
@@ -1195,7 +1189,6 @@
         fetch(webAppUrl, {
           method: 'POST',
           mode: 'cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: "deleteExpense",
             data: { id: deleteIdTarget }
