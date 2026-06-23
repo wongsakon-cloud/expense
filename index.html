@@ -56,13 +56,17 @@
         <div>
           <h1 class="text-sm font-extrabold text-slate-800 dark:text-white leading-tight">ระบบเบิกจ่ายคลาวด์</h1>
           <div class="flex items-center gap-1.5 mt-0.5">
-            <span id="syncStatusBadge" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            <span id="syncStatusBadge" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
             <span id="syncStatusText" class="text-[10px] font-bold text-slate-500 dark:text-gray-400">กำลังตรวจสอบสถานะ...</span>
           </div>
         </div>
       </div>
       
       <div class="flex items-center gap-2">
+        <!-- ปุ่มรีเฟรชข้อมูลคลาวด์ -->
+        <button onclick="fetchExpensesFromCloud()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all">
+          <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+        </button>
         <!-- ปุ่มเปิดปิดโหมดมืด -->
         <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:scale-105 transition-all">
           <i id="themeIcon" data-lucide="sun" class="w-4 h-4"></i>
@@ -251,7 +255,7 @@
         </div>
 
         <div class="text-[10px] text-center font-bold text-slate-400 mb-2">
-          💡 แแตะที่หมวดหมู่ด้านล่างเพื่อแสดงปฏิทินรายจ่าย
+          💡 แตะที่หมวดหมู่ด้านล่างเพื่อแสดงปฏิทินรายจ่าย
         </div>
 
         <div id="chartLegendContainer" class="space-y-2 mt-4">
@@ -260,7 +264,7 @@
     </div>
   </main>
 
-  <!-- โมดอลต่างๆ คงสีสันหน้าตาเดิมไว้ทั้งหมด -->
+  <!-- โมดอลจัดการหมวดหมู่และป๊อปอัปยืนยันต่างๆ -->
   <div id="addCategoryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs space-y-4 shadow-xl m-auto max-h-[90vh] overflow-y-auto scrollbar-hide">
       <div class="flex items-center justify-between mb-2">
@@ -293,31 +297,15 @@
           <select id="newCatEmoji" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
             <option value="🍱">🍱 อาหาร / กล่องข้าว</option>
             <option value="☕">☕ กาแฟ / เครื่องดื่ม</option>
-            <option value="🍜">🍜 บะหมี่ / มื้อเย็น</option>
+            <option value="🍜">🍜 มื้อหลัก / เมนูพิเศษ</option>
             <option value="🍕">🍕 พิซซ่า / ฟาสต์ฟู้ด</option>
             <option value="🍰">🍰 ขนมหวาน / เบเกอรี</option>
-            <option value="🍎">🍎 ผลไม้ / สุขภาพ</option>
             <option value="🛍️">🛍️ ช้อปปิ้ง / เสื้อผ้า</option>
-            <option value="👟">👟 แฟชั่น / รองเท้า</option>
-            <option value="💄">💄 เครื่องสำอาง / ความงาม</option>
-            <option value="🏠">🏠 บ้าน / ค่าเช่า</option>
-            <option value="🔌">🔌 ค่าน้ำค่าไฟ / สาธารณูปโภค</option>
-            <option value="🛒">🛒 ของใช้ในบ้าน / ซูเปอร์</option>
-            <option value="🧼">🧼 ของใช้ส่วนตัว / สบู่</option>
-            <option value="🚗">🚗 เดินทาง / ค่าน้ำมัน</option>
-            <option value="✈️">✈️ ท่องเที่ยว / เครื่องบิน</option>
-            <option value="🚲">🚲 ขนส่งสาธารณะ / วิน</option>
-            <option value="🍿">🍿 สันทนาการ / ภาพยนตร์</option>
-            <option value="🎮">🎮 เกมส์ / พักผ่อน</option>
-            <option value="📚">📚 หนังสือ / การศึกษา</option>
-            <option value="🩺">🩺 แพทย์ / โรงพยาบาล</option>
-            <option value="💊">💊 ยา / วิตามิน</option>
-            <option value="🐶">🐶 สัตว์เลี้ยง / อาหารสัตว์</option>
-            <option value="🎁">🎁 ของขวัญ / บริจาค</option>
-            <option value="💸">💸 หนี้สิน / โอนเงิน</option>
-            <option value="💼">💼 การทำงาน / ธุรกิจ</option>
-            <option value="📦">📦 พัสดุ / ไปรษณีย์</option>
-            <option value="🏷️">🏷️ ป้ายกำกับ / อื่นๆ</option>
+            <option value="🏡">🏡 บ้าน / ที่พักอาศัย</option>
+            <option value="🚗">🚗 ค่าเดินทาง / พาหนะ</option>
+            <option value="🍿">🍿 พักผ่อน / สันทนาการ</option>
+            <option value="🩺">🩺 การแพทย์ / สุขภาพ</option>
+            <option value="🏷️">🏷️ อื่นๆ</option>
           </select>
         </div>
         <div>
@@ -331,6 +319,7 @@
     </div>
   </div>
 
+  <!-- โมดอลปฏิทินสถิติรายจ่ายรายหมวด -->
   <div id="categoryCalendarModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-2xl transition-colors m-auto max-h-[90vh] overflow-y-auto scrollbar-hide">
       <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-gray-800">
@@ -373,6 +362,7 @@
     </div>
   </div>
 
+  <!-- โมดอลยืนยันการลบ -->
   <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs text-center space-y-4 shadow-xl m-auto max-h-[90vh] overflow-y-auto scrollbar-hide">
       <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/30 rounded-2xl flex items-center justify-center mx-auto text-rose-500">
@@ -389,9 +379,10 @@
     </div>
   </div>
 
+  <!-- กล่องแสดงการแจ้งเตือน Toast -->
   <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- JavaScript คอนโทรลเลอร์ (ปรับปรุงการบันทึก) -->
+  <!-- ส่วนของ JavaScript การทำงานของแอปพลิเคชัน -->
   <script>
     const DEMO_KEY = "expense_tracker_demo_data";
     const MOCK_EXPENSES = [
@@ -411,8 +402,10 @@
 
     let expenses = [];
     let isCloudMode = true; 
-    // ⚠️ อย่าลืมตรวจสอบลิงก์ Web App URL ของคุณตรงนี้ให้ตรงกับในระบบ Google Apps Script
-    let webAppUrl = "https://script.google.com/macros/s/AKfycbzxxlQhekGaBdpB3QtQz5MaBCEn563k9NKe5bnxewcqd6SNgDIoDG0veLKHsblJRZqi/exec"; 
+    
+    // ตั้งค่า URL สำหรับการ Deploy Google Apps Script ของคุณโดยตรง
+    let webAppUrl = "https://script.google.com/macros/s/AKfycbwJx7hNOqD00CqPZ8GNm6Xpa_ACtuqpiq6KH47DDxifvgJJdO80Hq-HApjyzN0GIOFU/exec"; 
+    
     let editingId = null;
     let deleteIdTarget = null;
     let selectedMonth = ""; 
@@ -440,7 +433,7 @@
       setDefaultStatsDates(); 
       populateCategorySelects(); 
       
-      updateStatusBadge(true, "เชื่อมคลาวด์สด");
+      updateStatusBadge(false, "กำลังเชื่อมต่อ...");
       fetchExpensesFromCloud();
       
       const today = new Date().toISOString().split('T')[0];
@@ -469,8 +462,10 @@
     function updateStatusBadge(active, text) {
       const badge = document.getElementById('syncStatusBadge');
       const badgeText = document.getElementById('syncStatusText');
-      badge.className = `w-2 h-2 rounded-full ${active ? "bg-emerald-500" : "bg-amber-500"} animate-pulse`;
-      badgeText.innerText = text;
+      if (badge && badgeText) {
+        badge.className = `w-2.5 h-2.5 rounded-full ${active ? "bg-emerald-500" : "bg-amber-500"} animate-pulse`;
+        badgeText.innerText = text;
+      }
     }
 
     function setDefaultStatsDates() {
@@ -639,31 +634,47 @@
       renderDataAndStats();
     }
 
+    // แก้ไขฟังก์ชันดึงข้อมูลให้ยิงแบบ POST ด้วย text/plain เพื่อป้องกันสิทธิ์ CORS บล็อกสัญญาณ
     function fetchExpensesFromCloud() {
       const addLoader = document.getElementById('loadingIndicatorAdd');
-      if(addLoader) addLoader.classList.remove('hidden');
+      if (addLoader) addLoader.classList.remove('hidden');
+      updateStatusBadge(false, "กำลังซิงก์...");
 
-      fetch(`${webAppUrl}?action=getExpenses`, {
-        method: 'GET',
+      fetch(webAppUrl, {
+        method: 'POST',
         mode: 'cors',
-        redirect: 'follow',
-        headers: { 'Accept': 'application/json' }
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({
+          action: 'getExpenses',
+          data: {}
+        })
       })
       .then(res => {
-        if (!res.ok) throw new Error("สถานะเซิร์ฟเวอร์คลาวด์ไม่ปกติ");
+        if (!res.ok) throw new Error("สถานะเชื่อมต่อคลาวด์ไม่ปกติ");
         return res.json();
       })
-      .then(data => {
-        expenses = Array.isArray(data) ? data : [];
+      .then(resData => {
+        // แบ็กเอนด์ของ doPost จะห่อข้อมูลผลลัพธ์ไว้ที่ data ของออบเจกต์ หรือส่งแบบอาเรย์โดยตรง
+        let rawItems = [];
+        if (resData && resData.status === 'success') {
+          rawItems = resData.data;
+        } else if (Array.isArray(resData)) {
+          rawItems = resData;
+        }
+        
+        expenses = Array.isArray(rawItems) ? rawItems : [];
         autoDiscoverSheetCategories(expenses); 
         renderDataAndStats();
-        if(addLoader) addLoader.classList.add('hidden');
-        showToast("ซิงก์ข้อมูลคลาวด์เรียบร้อย", "cloud-lightning");
+        if (addLoader) addLoader.classList.add('hidden');
+        updateStatusBadge(true, "เชื่อมคลาวด์สด");
+        showToast("ซิงก์ข้อมูลคลาวด์สำเร็จ", "cloud-lightning");
       })
       .catch(err => {
-        console.error(err);
-        if(addLoader) addLoader.classList.add('hidden');
-        showToast("เชื่อมคลาวด์ล้มเหลว สลับเป็นโหมดจำลอง", "alert-triangle");
+        console.error("Cloud connection failed:", err);
+        if (addLoader) addLoader.classList.add('hidden');
+        showToast("สลับเข้าโหมดออฟไลน์ / โหมดจำลอง", "alert-triangle");
         isCloudMode = false;
         updateStatusBadge(false, "ดึงข้อมูลไม่ได้");
         loadLocalExpenses();
@@ -721,16 +732,17 @@
     function generateExpenseRowHtml(e) {
       const style = CATEGORY_STYLES[e.category] || CATEGORY_STYLES["อื่นๆ"];
       const amt = parseFloat(e.amount) || 0;
+      const colorHex = style.hex || "#64748b";
       
       return `
         <div class="bg-white dark:bg-[#13151C] border border-slate-100 dark:border-gray-800/40 p-3.5 rounded-2xl flex items-center justify-between shadow-sm hover:scale-[1.005] transition-all group">
           <div class="flex items-center gap-3 min-w-0">
-            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-base shadow-sm" style="background-color: ${style.hex}15; color: ${style.hex}">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-base shadow-sm" style="background-color: ${colorHex}15; color: ${colorHex}">
               ${style.emoji}
             </div>
             <div class="min-w-0">
               <p class="text-xs font-black text-slate-800 dark:text-gray-100 truncate">${e.description}</p>
-              <p class="text-[10px] text-slate-400 dark:text-gray-500 font-bold mt-0.5">${formatDateThai(e.date)} · <span style="color: ${style.hex}">${e.category}</span></p>
+              <p class="text-[10px] text-slate-400 dark:text-gray-500 font-bold mt-0.5">${formatDateThai(e.date)} · <span style="color: ${colorHex}">${e.category}</span></p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
@@ -904,10 +916,11 @@
       calSelectedDayStr = ""; 
       
       const style = CATEGORY_STYLES[categoryName] || CATEGORY_STYLES["อื่นๆ"];
+      const colorHex = style.hex || "#64748b";
       const headerIcon = document.getElementById('calHeaderIcon');
       headerIcon.innerText = style.emoji;
-      headerIcon.style.backgroundColor = `${style.hex}15`;
-      headerIcon.style.color = style.hex;
+      headerIcon.style.backgroundColor = `${colorHex}15`;
+      headerIcon.style.color = colorHex;
       
       document.getElementById('calHeaderTitle').innerText = `ปฏิทินรายจ่าย: ${categoryName}`;
       renderCalendar();
@@ -1027,7 +1040,7 @@
       return `${parseInt(p[2])} ${months[parseInt(p[1]) - 1]} ${parseInt(p[0]) + 543}`;
     }
 
-    // ================= [แก้ไขหลักที่นี่] ระบบส่งฟอร์มบันทึกข้อมูลลง Google Sheet และแอปพลิเคชัน =================
+    // ฟังก์ชันจัดการเพิ่ม/แก้ไขรายการเบิกจ่าย ส่งแบบ POST พร้อม CORS Guardrail เพื่อป้องกันปัญหา "ดึงข้อมูลไม่ได้"
     function handleFormSubmit(e) {
       e.preventDefault();
       
@@ -1042,35 +1055,30 @@
       }
       
       if(editingId) {
-        // 1. โหมดแก้ไขข้อมูลเดิม
+        // 1. โหมดแก้ไขข้อมูล
         const targetIndex = expenses.findIndex(ex => ex.id === editingId);
         if(targetIndex !== -1) {
           expenses[targetIndex] = { ...expenses[targetIndex], date, category, description, amount };
         }
         
-        // เรนเดอร์บนหน้าจอก่อนทันทีเพื่อให้แอปตอบสนองไว ไม่ต้องรอคอยเน็ต
         renderDataAndStats();
         
         if(isCloudMode) {
           showToast("กำลังอัปเดตข้อมูลบนคลาวด์...", "loader");
           
-          // แก้ไขการจัดรูปแบบส่งหา Apps Script ให้ถูกต้องตามฟังก์ชัน doPost(e)
-          const payload = {
-            action: "updateExpense",
-            data: { id: editingId, date, category, description, amount }
-          };
-
           fetch(webAppUrl, {
             method: 'POST',
             mode: 'cors',
-            redirect: 'follow',
-            body: JSON.stringify(payload)
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: "updateExpense",
+              data: { id: editingId, date, category, description, amount }
+            })
           })
           .then(res => res.json())
           .then(resData => {
             if(resData.status === 'success') {
-              showToast("อัปเดตข้อมูลลงชีทเรียบร้อย", "check-circle");
-              // โหลดดึงยอดทั้งหมดรอบล่าสุดมา Re-check
+              showToast("อัปเดตข้อมูลบน Google Sheet แล้ว", "check-circle");
               fetchExpensesFromCloud();
             } else {
               throw new Error(resData.message);
@@ -1087,35 +1095,30 @@
         cancelEditMode();
         
       } else {
-        // 2. โหมดกดบันทึกรายการเบิกจ่ายใหม่
+        // 2. โหมดสร้างข้อมูลใหม่
         const newId = Date.now().toString();
         const newExpense = { id: newId, date, category, description, amount };
         
-        // เอาเข้าคิวบนหน้าแอปเพื่อให้ผู้ใช้เห็นทันที
         expenses.unshift(newExpense);
         renderDataAndStats();
         resetFormInputs();
         
         if(isCloudMode) {
-          showToast("กำลังบันทึกลงคลาวด์ชีท...", "loader");
+          showToast("กำลังบันทึกลงคลาวด์...", "loader");
           
-          // แก้ไขการจัดโครงสร้าง Payload คีย์ข้อมูลให้ตรงตาม API ของ Google Sheets 
-          const payload = {
-            action: "addExpense",
-            data: { date, category, description, amount }
-          };
-
           fetch(webAppUrl, {
             method: 'POST',
             mode: 'cors',
-            redirect: 'follow',
-            body: JSON.stringify(payload)
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: "addExpense",
+              data: { date, category, description, amount }
+            })
           })
           .then(res => res.json())
           .then(resData => {
             if(resData.status === 'success') {
               showToast("บันทึกข้อมูลลง Google Sheet สำเร็จ!", "check-circle");
-              // ซิงก์ดึงข้อมูลอัปเดตล่าสุดมาล้างความถูกต้องของ ID อีกครั้ง
               fetchExpensesFromCloud();
             } else {
               throw new Error(resData.message);
@@ -1123,7 +1126,7 @@
           })
           .catch(err => {
             console.error(err);
-            showToast("ส่งข้อมูลลงชีทล้มเหลว", "alert-triangle");
+            showToast("ส่งข้อมูลลงคลาวด์ชีทล้มเหลว", "alert-triangle");
           });
         } else {
           localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
@@ -1182,19 +1185,30 @@
       }
     }
 
+    // ปรับปรุงฟังก์ชันลบข้อมูลส่งแบบ POST เพื่อลดปัญหา CORS Preflight
     function executeDeleteExpense() {
       if(!deleteIdTarget) return;
       
       if(isCloudMode) {
         showToast("กำลังลบข้อมูลบนคลาวด์...", "loader");
-        fetch(`${webAppUrl}?action=deleteExpense&id=${deleteIdTarget}`, {
-          method: 'GET',
+        
+        fetch(webAppUrl, {
+          method: 'POST',
           mode: 'cors',
-          redirect: 'follow'
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: "deleteExpense",
+            data: { id: deleteIdTarget }
+          })
         })
         .then(res => res.json())
-        .then(() => {
-          fetchExpensesFromCloud();
+        .then(resData => {
+          if (resData.status === 'success') {
+            showToast("ลบข้อมูลสำเร็จ", "trash");
+            fetchExpensesFromCloud();
+          } else {
+            throw new Error(resData.message);
+          }
           toggleDeleteModal(false);
         })
         .catch(err => {
