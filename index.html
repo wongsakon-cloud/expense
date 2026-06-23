@@ -127,11 +127,8 @@
             <div>
               <label class="text-[11px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">หมวดหมู่</label>
               <div class="flex gap-2">
-                <!-- Dropdown หมวดหมู่ ถูกสร้างผ่าน JS โดยจะแยก 'อื่นๆ' ให้อยู่ล่างสุดเสมอ -->
                 <select id="categoryInput" required class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-[11px] font-bold outline-none focus:border-emerald-500 transition-all">
-                  <!-- JS จะเติมข้อมูลอัตโนมัติ -->
                 </select>
-                <!-- ปุ่มเพิ่มหมวดหมู่ -->
                 <button type="button" onclick="toggleAddCategoryModal(true)" class="bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-gray-700 w-11 flex-shrink-0 rounded-xl flex items-center justify-center transition-colors">
                   <i data-lucide="plus" class="w-4 h-4"></i>
                 </button>
@@ -167,32 +164,25 @@
           <button onclick="switchTab('history')" class="text-[10px] text-emerald-500 hover:underline font-bold">ดูทั้งหมด &rarr;</button>
         </div>
 
-        <!-- โหลดเดอร์แอนิเมชันสำหรับบอกสถานะการเชื่อมต่อ -->
         <div id="loadingIndicatorAdd" class="hidden bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800/50 p-8 rounded-3xl text-center space-y-3">
           <div class="w-8 h-8 rounded-full border-3 border-emerald-500 border-t-transparent animate-spin mx-auto"></div>
           <p class="text-xs text-slate-500 dark:text-gray-400 font-bold animate-pulse-soft">กำลังดึงฐานข้อมูลคลาวด์...</p>
         </div>
 
-        <!-- โหนดแสดงรายการผลลัพธ์ (5 รายการ) -->
         <div id="recentExpensesContainer" class="space-y-2">
-          <!-- จะนำเข้าประวัติผ่านการ Render ฝั่ง JavaScript -->
         </div>
       </section>
     </div>
 
     <!-- ส่วนที่ 2: แท็บคลังประวัติ (แยกย่อยตามเดือน) -->
     <div id="content-history" class="hidden space-y-4">
-      
-      <!-- เมนูชิปรายเดือน (แนวนอน) -->
       <div class="relative">
         <div class="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-slate-50 dark:from-[#0D0F14] to-transparent z-10 pointer-events-none"></div>
         <div class="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-slate-50 dark:from-[#0D0F14] to-transparent z-10 pointer-events-none"></div>
         <div id="monthChipsContainer" class="flex gap-2 overflow-x-auto scrollbar-hide py-1 px-1">
-          <!-- แถบรายเดือนจะถูกป้อนผ่าน JS -->
         </div>
       </div>
 
-      <!-- สรุปของเดือนที่เลือก -->
       <div class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-4 rounded-3xl flex items-center justify-between shadow-sm">
         <div>
           <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">รวมรายจ่ายเดือนนี้</p>
@@ -204,27 +194,21 @@
         </div>
       </div>
 
-      <!-- ตัวกรองการแสดงผลและค้นหาในคลังประวัติ -->
       <div class="flex gap-2 mb-2">
         <div class="relative flex-1">
           <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
           <input type="text" id="searchInput" oninput="filterHistory()" placeholder="ค้นหาในเดือนนี้..." class="w-full bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none focus:border-emerald-500 transition-all shadow-sm">
         </div>
         <select id="filterCategory" onchange="filterHistory()" class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-xl px-3 text-xs font-bold outline-none shadow-sm">
-          <!-- จะนำเข้าหมวดหมู่ผ่าน JS -->
         </select>
       </div>
 
-      <!-- โหนดแสดงรายการผลลัพธ์ในเดือนนั้นๆ -->
       <div id="historyExpensesContainer" class="space-y-2 pb-4">
-        <!-- จะนำเข้าประวัติผ่านการ Render ฝั่ง JavaScript -->
       </div>
     </div>
 
     <!-- ส่วนที่ 3: แท็บแผนภูมิสถิติรายจ่าย -->
     <div id="content-stats" class="hidden space-y-4">
-      
-      <!-- ส่วนกล่องเครื่องมือฟิลเตอร์กรองสถิติแบบระบุเงื่อนไข -->
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-4 rounded-3xl shadow-sm space-y-3">
         <div class="flex items-center justify-between">
           <h4 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -237,7 +221,6 @@
           <div>
             <label class="text-[10px] font-bold text-slate-400 block mb-1">หมวดหมู่</label>
             <select id="statsFilterCategory" onchange="renderStatsView()" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-purple-500 transition-all">
-              <!-- ป้อนข้อมูลอัตโนมัติผ่าน JavaScript -->
             </select>
           </div>
           <div class="grid grid-cols-2 gap-2">
@@ -253,13 +236,11 @@
         </div>
       </section>
 
-      <!-- บล็อกแสดงผลกราฟวงกลมและรายงานกลุ่มหมวดหมู่ -->
       <section class="bg-white dark:bg-[#13151C] border border-slate-200/60 dark:border-gray-800/50 p-5 rounded-3xl shadow-sm">
         <h3 class="text-sm font-extrabold flex items-center gap-2 mb-4">
           <span class="w-2 h-4 bg-purple-500 rounded"></span> สัดส่วนรายจ่ายตามหมวดหมู่
         </h3>
 
-        <!-- กราฟวงกลมจำลองด้วย SVG & conic-gradient -->
         <div class="flex flex-col items-center justify-center py-4">
           <div id="chartDonut" class="w-44 h-44 rounded-full shadow-inner relative flex items-center justify-center transition-all duration-500" style="background: conic-gradient(#e2e8f0 0% 100%)">
             <div class="w-32 h-32 bg-white dark:bg-[#13151C] rounded-full flex flex-col items-center justify-center shadow-md">
@@ -270,19 +251,16 @@
         </div>
 
         <div class="text-[10px] text-center font-bold text-slate-400 mb-2">
-          💡 แตะที่หมวดหมู่ด้านล่างเพื่อแสดงปฏิทินรายจ่าย
+          💡 แแตะที่หมวดหมู่ด้านล่างเพื่อแสดงปฏิทินรายจ่าย
         </div>
 
-        <!-- รายละเอียดข้อมูลแสดงรายการสรุปผลแบบแถวแนวตั้ง (Row List) พร้อมสีและอัตราส่วนสถิติที่สอดคล้องกัน -->
         <div id="chartLegendContainer" class="space-y-2 mt-4">
-          <!-- รายการคำนวณแต่ละหมวดหมู่จะสร้างผ่านฟังก์ชัน JS -->
         </div>
       </section>
     </div>
-
   </main>
 
-  <!-- หน้าต่างเพิ่มหมวดหมู่ (Custom Add Category Modal - ปรับปรุงกึ่งกลางเด่นสายตาเสมอ) -->
+  <!-- โมดอลต่างๆ คงสีสันหน้าตาเดิมไว้ทั้งหมด -->
   <div id="addCategoryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs space-y-4 shadow-xl m-auto max-h-[90vh] overflow-y-auto scrollbar-hide">
       <div class="flex items-center justify-between mb-2">
@@ -293,8 +271,6 @@
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
-
-      <!-- แถบระบุรูปแบบการทำงาน (ฟังก์ชัน Edit หมวดหมู่เพิ่มใหม่) -->
       <div>
         <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">โหมดการทำงาน</label>
         <select id="catModalMode" onchange="updateCategoryModalMode()" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
@@ -302,25 +278,19 @@
           <option value="edit">✏️ แก้ไขหมวดหมู่ที่มีอยู่</option>
         </select>
       </div>
-
-      <!-- ส่วนสำหรับเลือกหมวดหมู่ที่จะแก้ไข (แสดงเมื่อเป็นโหมด edit) -->
       <div id="editCatSelectContainer" class="hidden">
         <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">เลือกหมวดหมู่ที่ต้องการแก้</label>
         <select id="editCategoryTarget" onchange="populateCategoryEditFields()" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
-          <!-- JS ป้อนข้อมูลหมวดหมู่ทั้งหมดให้ทำงาน -->
         </select>
       </div>
-
       <div>
         <label id="newCatNameLabel" class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">ชื่อหมวดหมู่</label>
         <input type="text" id="newCatName" placeholder="เช่น ค่ากาแฟ, ช้อปปิ้ง" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
       </div>
-
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="text-[10px] font-bold text-slate-500 dark:text-gray-400 mb-1.5 block">ไอคอน (Emoji)</label>
           <select id="newCatEmoji" class="w-full bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl px-2 py-3 text-xs font-bold outline-none focus:border-emerald-500 transition-all">
-            <!-- จัดกลุ่มหมวดหมู่สัญลักษณ์ Emoji หลากหลายขึ้นมากเพื่อความพรีเมียม -->
             <option value="🍱">🍱 อาหาร / กล่องข้าว</option>
             <option value="☕">☕ กาแฟ / เครื่องดื่ม</option>
             <option value="🍜">🍜 บะหมี่ / มื้อเย็น</option>
@@ -355,22 +325,17 @@
           <input type="color" id="newCatColor" value="#10b981" class="w-full h-12 bg-slate-50 dark:bg-[#1A1C24] border border-slate-200 dark:border-gray-800 rounded-xl p-1 outline-none cursor-pointer">
         </div>
       </div>
-
       <button id="saveCategoryBtn" onclick="saveNewCategory()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-3.5 px-4 rounded-xl shadow-md mt-2">
         ยืนยันการสร้าง
       </button>
     </div>
   </div>
 
-  <!-- หน้าต่างประวัติปฏิทินหมวดหมู่แบบการ์ดแก้วลอยพรีเมียม (Category Calendar Modal - ปรับปรุงกึ่งกลางเด่นสายตาเสมอ) -->
   <div id="categoryCalendarModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-2xl transition-colors m-auto max-h-[90vh] overflow-y-auto scrollbar-hide">
-      <!-- ส่วนหัวของโมดอลแสดงชื่อหมวดหมู่ที่เลือก -->
       <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-gray-800">
         <div class="flex items-center gap-2">
-          <div id="calHeaderIcon" class="w-8 h-8 rounded-xl flex items-center justify-center text-sm shadow-sm">
-            <!-- Icon/Emoji -->
-          </div>
+          <div id="calHeaderIcon" class="w-8 h-8 rounded-xl flex items-center justify-center text-sm shadow-sm"></div>
           <div>
             <h4 id="calHeaderTitle" class="text-xs font-extrabold text-slate-800 dark:text-white leading-tight">สถิติหมวดหมู่</h4>
             <p id="calHeaderSubtitle" class="text-[10px] text-slate-400 font-bold mt-0.5">คลิกวันที่ล้อมรอบด้วยวงกลมเพื่อดูรายการ</p>
@@ -381,7 +346,6 @@
         </button>
       </div>
 
-      <!-- คอนโทรลเนวิเกเตอร์ เดือน/ปี ของปฏิทิน -->
       <div class="flex items-center justify-between px-1">
         <button onclick="changeCalMonth(-1)" class="p-2 rounded-xl bg-slate-50 dark:bg-gray-800/60 hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 transition-all">
           <i data-lucide="chevron-left" class="w-4 h-4"></i>
@@ -392,46 +356,23 @@
         </button>
       </div>
 
-      <!-- ตารางปฏิทินปูพื้นฐาน -->
       <div class="space-y-1">
-        <!-- แถวหัวสัปดาห์ (Sun-Sat) -->
         <div class="grid grid-cols-7 text-center text-[10px] font-bold text-slate-400">
-          <div>อา.</div>
-          <div>จ.</div>
-          <div>อ.</div>
-          <div>พ.</div>
-          <div>พฤ.</div>
-          <div>ศ.</div>
-          <div>ส.</div>
+          <div>อา.</div><div>จ.</div><div>อ.</div><div>พ.</div><div>พฤ.</div><div>ศ.</div><div>ส.</div>
         </div>
-        <!-- ตารางวันที่จะถูกเขียนผ่าน JavaScript ดึงข้อมูลสดมาไฮไลต์อย่างงดงาม -->
-        <div id="calDaysGrid" class="grid grid-cols-7 gap-1 text-center">
-          <!-- วันที่จะถูกป้อนเข้ามาสร้างความเปลี่ยนแปลงที่นี่ -->
-        </div>
+        <div id="calDaysGrid" class="grid grid-cols-7 gap-1 text-center"></div>
       </div>
 
-      <!-- ส่วนแจ้งรายละเอียดของวันที่ที่ผู้ใช้ทำการเลือกดู -->
       <div class="pt-2 border-t border-slate-100 dark:border-gray-800">
         <div class="flex items-center justify-between mb-2">
-          <h5 id="calDetailHeader" class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-            รายละเอียดรายการวันที่เลือก
-          </h5>
-          <span id="calDetailDateBadge" class="text-[10px] font-black text-emerald-500">
-            แตะเลือกวัน
-          </span>
+          <h5 id="calDetailHeader" class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">รายละเอียดรายการวันที่เลือก</h5>
+          <span id="calDetailDateBadge" class="text-[10px] font-black text-emerald-500">แตะเลือกวัน</span>
         </div>
-        
-        <!-- รายการสรุปภายในวันนั้น -->
-        <div id="calDetailListContainer" class="space-y-2 max-h-40 overflow-y-auto scrollbar-hide">
-          <div class="text-center py-4 text-xs font-bold text-slate-400">
-            โปรดเลือกวันที่วงกลมสีเพื่อแสดงประวัติ
-          </div>
-        </div>
+        <div id="calDetailListContainer" class="space-y-2 max-h-40 overflow-y-auto scrollbar-hide"></div>
       </div>
     </div>
   </div>
 
-  <!-- หน้าต่างแก้วป็อปอัปยืนยันการลบข้อมูล (Custom Modal - ปรับปรุงกึ่งกลางเด่นสายตาเสมอ) -->
   <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white dark:bg-[#13151C] border border-slate-200 dark:border-gray-800 rounded-3xl p-6 w-full max-w-xs text-center space-y-4 shadow-xl m-auto max-h-[90vh] overflow-y-auto scrollbar-hide">
       <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/30 rounded-2xl flex items-center justify-center mx-auto text-rose-500">
@@ -448,10 +389,9 @@
     </div>
   </div>
 
-  <!-- ระบบป็อปอัปแจ้งเตือนลอยพริ้วไหว (Floating Toasts Manager) -->
   <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- ----------------- ส่วนระบบควบคุมโปรแกรมหลักผ่านสคริปต์ JavaScript ----------------- -->
+  <!-- JavaScript คอนโทรลเลอร์ (ปรับปรุงการบันทึก) -->
   <script>
     const DEMO_KEY = "expense_tracker_demo_data";
     const MOCK_EXPENSES = [
@@ -460,7 +400,6 @@
       { id: "3", date: new Date().toISOString().split('T')[0], category: "ค่าบริการ", description: "บิลค่าน้ำและไฟฟ้าสำนักงาน", amount: 1450.50 }
     ];
 
-    // หมวดหมู่ดั้งเดิมพื้นฐาน (สีถูกอิงตามระบบ HEX เป็นหลักในการไล่ระดับ Donut และ List)
     const DEFAULT_CATEGORIES = {
       "อาหาร": { emoji: "🍱", color: "from-amber-400 to-orange-500", hex: "#f59e0b" },
       "เดินทาง": { emoji: "🚗", color: "from-blue-400 to-indigo-500", hex: "#3b82f6" },
@@ -470,21 +409,19 @@
       "อื่นๆ": { emoji: "🪙", color: "from-slate-400 to-gray-500", hex: "#64748b" }
     };
 
-    // ตัวแปรส่วนกลาง
     let expenses = [];
     let isCloudMode = true; 
-    let webAppUrl = "https://script.google.com/macros/s/AKfycbxl6Xh99KAVMo7S8coqrYrqGDTRCfnmTgDOqgRrnYrBsbWmCQRFLS-hTez3fqQyGE4L/exec"; 
+    // ⚠️ อย่าลืมตรวจสอบลิงก์ Web App URL ของคุณตรงนี้ให้ตรงกับในระบบ Google Apps Script
+    let webAppUrl = "https://script.google.com/macros/s/AKfycbzxxlQhekGaBdpB3QtQz5MaBCEn563k9NKe5bnxewcqd6SNgDIoDG0veLKHsblJRZqi/exec"; 
     let editingId = null;
     let deleteIdTarget = null;
-    let selectedMonth = ""; // เก็บค่าเดือนที่เลือกในแท็บคลังประวัติ (รูปแบบ YYYY-MM)
+    let selectedMonth = ""; 
 
-    // ตัวแปรของระบบปฏิทินสถิติรายวัน
     let calSelectedCategory = "";
     let calCurrentYear = new Date().getFullYear();
-    let calCurrentMonth = new Date().getMonth(); // 0-11
-    let calSelectedDayStr = ""; // "YYYY-MM-DD"
+    let calCurrentMonth = new Date().getMonth(); 
+    let calSelectedDayStr = ""; 
 
-    // โหลดหมวดหมู่จาก localStorage อย่างถาวร
     let customCategories = JSON.parse(localStorage.getItem('expense_custom_categories')) || {};
     let CATEGORY_STYLES = {};
     updateCategoryStylesObj();
@@ -492,26 +429,22 @@
     function updateCategoryStylesObj() {
       let base = { ...DEFAULT_CATEGORIES };
       if (customCategories._renamedDefaults) {
-        customCategories._renamedDefaults.forEach(old => {
-          delete base[old];
-        });
+        customCategories._renamedDefaults.forEach(old => { delete base[old]; });
       }
       CATEGORY_STYLES = { ...base, ...customCategories };
       delete CATEGORY_STYLES._renamedDefaults;
     }
 
-    // ระบบทำงานเมื่อเริ่มต้น (DOMContentLoaded)
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
-      setDefaultStatsDates(); // ตั้งค่าช่วงวันที่เริ่มต้นของหน้าสถิติเป็นเดือนปัจจุบัน
-      populateCategorySelects(); // เรนเดอร์ Dropdown หมวดหมู่ (โดยเอา 'อื่นๆ' ไว้ล่างสุดเสมอ)
+      setDefaultStatsDates(); 
+      populateCategorySelects(); 
       
       updateStatusBadge(true, "เชื่อมคลาวด์สด");
       fetchExpensesFromCloud();
       
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('dateInput').value = today;
-      
       lucide.createIcons();
     });
 
@@ -536,22 +469,15 @@
     function updateStatusBadge(active, text) {
       const badge = document.getElementById('syncStatusBadge');
       const badgeText = document.getElementById('syncStatusText');
-
-      const bgClass = active ? "bg-emerald-500" : "bg-amber-500";
-      badge.className = `w-2 h-2 rounded-full ${bgClass} animate-pulse`;
+      badge.className = `w-2 h-2 rounded-full ${active ? "bg-emerald-500" : "bg-amber-500"} animate-pulse`;
       badgeText.innerText = text;
     }
 
-    // ฟังก์ชันตั้งค่าเริ่มต้นให้ช่วงเวลาของหน้าสถิติเป็น "ทุกยอดของเดือนปัจจุบัน"
     function setDefaultStatsDates() {
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
-      
-      // วันแรกของเดือนปัจจุบัน
       const startOfMonth = `${year}-${month}-01`;
-      
-      // วันสุดท้ายของเดือนปัจจุบันแบบไดนามิก
       const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
       const endOfMonth = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
       
@@ -559,7 +485,6 @@
       document.getElementById('statsEndDate').value = endOfMonth;
     }
 
-    // รีเซ็ตการกรองหน้าสถิติกลับเป็นค่าเริ่มต้น
     function resetStatsFilter() {
       document.getElementById('statsFilterCategory').value = "ทั้งหมด";
       setDefaultStatsDates();
@@ -567,23 +492,17 @@
       showToast("รีเซ็ตตัวกรองสถิติแล้ว", "sliders-horizontal");
     }
 
-    // ================= ระบบจัดการหมวดหมู่ (อื่นๆ ล่างสุดเสมอ) =================
     function populateCategorySelects() {
       const catInput = document.getElementById('categoryInput');
       const filterInput = document.getElementById('filterCategory');
       const statsFilterInput = document.getElementById('statsFilterCategory');
       
       let optionsHTML = '';
-      
-      // ดึงคีย์ทั้งหมดมา แต่ยกเว้นคีย์ "อื่นๆ" เพื่อนำไปจัดคิวลงทีหลังสุด
       const keys = Object.keys(CATEGORY_STYLES).filter(k => k !== 'อื่นๆ');
       keys.forEach(k => {
         optionsHTML += `<option value="${k}">${CATEGORY_STYLES[k].emoji} ${k}</option>`;
       });
-      
-      // แปะ "อื่นๆ" ปิดท้ายที่ล่างสุดเสมอตามเงื่อนไข
-      const othersOption = `<option value="อื่นๆ">${CATEGORY_STYLES['อื่นๆ'].emoji} อื่นๆ</option>`;
-      optionsHTML += othersOption;
+      optionsHTML += `<option value="อื่นๆ">${CATEGORY_STYLES['อื่นๆ'].emoji} อื่นๆ</option>`;
       
       if(catInput) catInput.innerHTML = optionsHTML;
       if(filterInput) filterInput.innerHTML = '<option value="ทั้งหมด">ทุกหมวดหมู่</option>' + optionsHTML;
@@ -601,7 +520,6 @@
       }
     }
 
-    // ฟังก์ชันจัดการ Layout และ Mode ของหน้าต่างแก้ไขหมวดหมู่
     function updateCategoryModalMode() {
       const mode = document.getElementById('catModalMode').value;
       const editSelectContainer = document.getElementById('editCatSelectContainer');
@@ -623,7 +541,6 @@
         saveBtn.innerText = "ยืนยันการแก้ไข";
         modalTitle.innerHTML = `<i data-lucide="edit-3" class="w-4 h-4 text-emerald-500"></i> แก้ไขหมวดหมู่`;
         
-        // โหลดรายการหมวดหมู่ที่มีอยู่ลงตารางตัวเลือก
         const editTargetSelect = document.getElementById('editCategoryTarget');
         let optionsHTML = '';
         Object.keys(CATEGORY_STYLES).forEach(k => {
@@ -635,11 +552,9 @@
       lucide.createIcons();
     }
 
-    // ฟังก์ชันดึงค่าหมวดหมู่ที่ต้องการแก้ไขมาใส่ในฟิลด์ข้อมูล
     function populateCategoryEditFields() {
       const targetCat = document.getElementById('editCategoryTarget').value;
       if(!targetCat || !CATEGORY_STYLES[targetCat]) return;
-      
       document.getElementById('newCatName').value = targetCat;
       document.getElementById('newCatEmoji').value = CATEGORY_STYLES[targetCat].emoji;
       document.getElementById('newCatColor').value = CATEGORY_STYLES[targetCat].hex || "#10b981";
@@ -664,67 +579,47 @@
         customCategories[name] = { emoji: emoji, color: "from-slate-200 to-slate-300", hex: hex };
         showToast("สร้างหมวดหมู่ใหม่สำเร็จ!", "check-circle");
       } else {
-        // โหมดแก้ไข (Edit Category)
         const oldName = document.getElementById('editCategoryTarget').value;
         if (!oldName) return;
-
         if (oldName !== name && CATEGORY_STYLES[name]) {
           showToast("มีหมวดหมู่ชื่อนี้อยู่แล้ว", "alert-circle");
           return;
         }
-
         if (oldName !== name) {
           delete customCategories[oldName];
           if (DEFAULT_CATEGORIES[oldName]) {
             if (!customCategories._renamedDefaults) customCategories._renamedDefaults = [];
             customCategories._renamedDefaults.push(oldName);
           }
-          
-          // อัปเดตข้อมูลประเภทหมวดหมู่เดิมในรายการบันทึกปัจจุบันย้อนหลังทั้งหมดให้ไม่เสียลิงก์
           expenses.forEach(exp => {
-            if (exp.category === oldName) {
-              exp.category = name;
-            }
+            if (exp.category === oldName) exp.category = name;
           });
         }
-
         customCategories[name] = { emoji: emoji, color: "from-slate-200 to-slate-300", hex: hex };
         showToast("แก้ไขหมวดหมู่สำเร็จ!", "check-circle");
       }
 
       updateCategoryStylesObj();
       localStorage.setItem('expense_custom_categories', JSON.stringify(customCategories));
-      if (!isCloudMode) {
-        localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
-      }
+      if (!isCloudMode) localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
       
       populateCategorySelects();
       toggleAddCategoryModal(false);
-      
       document.getElementById('categoryInput').value = name;
       renderDataAndStats(); 
     }
 
-    // ฟังก์ชันช่วยสแกนและค้นพบหมวดหมู่ใหม่ๆ จากประวัติที่มีอยู่จริงในชีทโดยอัตโนมัติ
     function autoDiscoverSheetCategories(items) {
       let discoveredNew = false;
-      
       items.forEach(item => {
         const catName = item.category;
         if (catName && !CATEGORY_STYLES[catName]) {
-          // หากพบหมวดหมู่ที่เพิ่งสกัดเจอจากชีท ให้ขึ้นทะเบียนสุ่มรหัสสีที่สวยงามให้อย่างประณีต
           const paletteColors = ["#ef4444", "#f97316", "#f59e0b", "#eab308", "#84cc16", "#10b981", "#06b6d4", "#3b82f6", "#6366f1", "#8b5cf6", "#d946ef", "#ec4899"];
           const randomHex = paletteColors[Math.floor(Math.random() * paletteColors.length)];
-          
-          customCategories[catName] = {
-            emoji: "🏷️", 
-            color: "from-slate-200 to-slate-300",
-            hex: randomHex
-          };
+          customCategories[catName] = { emoji: "🏷️", color: "from-slate-200 to-slate-300", hex: randomHex };
           discoveredNew = true;
         }
       });
-      
       if (discoveredNew) {
         updateCategoryStylesObj();
         localStorage.setItem('expense_custom_categories', JSON.stringify(customCategories));
@@ -732,7 +627,6 @@
       }
     }
 
-    // ================= ระบบดึงข้อมูลคลาวด์ =================
     function loadLocalExpenses() {
       const localData = localStorage.getItem(DEMO_KEY);
       if (localData) {
@@ -761,7 +655,7 @@
       })
       .then(data => {
         expenses = Array.isArray(data) ? data : [];
-        autoDiscoverSheetCategories(expenses); // ขุดหมวดหมู่เก่าๆ ในชีทมาเปิดใช้ถาวรที่นี่
+        autoDiscoverSheetCategories(expenses); 
         renderDataAndStats();
         if(addLoader) addLoader.classList.add('hidden');
         showToast("ซิงก์ข้อมูลคลาวด์เรียบร้อย", "cloud-lightning");
@@ -776,7 +670,6 @@
       });
     }
 
-    // ================= ระบบ Render หน้าจอหลักและการคำนวณสถิติ =================
     function renderDataAndStats() {
       renderRecentExpenses();
       calculateGlobalDashboard();
@@ -821,7 +714,6 @@
         container.innerHTML = `<div class="bg-white dark:bg-[#13151C] border border-dashed border-slate-200 dark:border-gray-800 p-8 rounded-3xl text-center text-xs text-slate-400 font-medium">ยังไม่มีรายการบันทึกในระบบ</div>`;
         return;
       }
-      
       container.innerHTML = top5.map(e => generateExpenseRowHtml(e)).join('');
       lucide.createIcons();
     }
@@ -852,15 +744,12 @@
       `;
     }
 
-    // ================= ระบบคลังประวัติ =================
     function renderMonthlyChips() {
       const container = document.getElementById('monthChipsContainer');
       if(!container) return;
       
       const monthsSet = new Set();
-      expenses.forEach(e => {
-        if(e.date) monthsSet.add(e.date.substring(0,7));
-      });
+      expenses.forEach(e => { if(e.date) monthsSet.add(e.date.substring(0,7)); });
       
       const currentYearMonth = new Date().toISOString().substring(0,7);
       monthsSet.add(currentYearMonth);
@@ -892,13 +781,11 @@
       if(!container) return;
       
       const filtered = expenses.filter(e => e.date && e.date.substring(0,7) === selectedMonth);
-      
       let sum = 0;
       filtered.forEach(e => sum += (parseFloat(e.amount) || 0));
       
       document.getElementById('monthTotalText').innerText = `฿${sum.toLocaleString('th-TH', {minimumFractionDigits:2})}`;
       document.getElementById('monthCountText').innerText = filtered.length;
-      
       filterHistory(); 
     }
 
@@ -908,10 +795,7 @@
       const container = document.getElementById('historyExpensesContainer');
       
       let items = expenses.filter(e => e.date && e.date.substring(0,7) === selectedMonth);
-      
-      if(cat !== "ทั้งหมด") {
-        items = items.filter(e => e.category === cat);
-      }
+      if(cat !== "ทั้งหมด") items = items.filter(e => e.category === cat);
       if(query) {
         items = items.filter(e => (e.description && e.description.toLowerCase().includes(query)) || (parseFloat(e.amount)||0).toString().includes(query));
       }
@@ -926,27 +810,18 @@
       lucide.createIcons();
     }
 
-    // ================= ระบบคำนวณและแสดงผลหน้าสถิติแบบยืดหยุ่น (Color-Matched Donut & List) =================
     function renderStatsView() {
       const catFilter = document.getElementById('statsFilterCategory').value;
       const startDate = document.getElementById('statsStartDate').value;
       const endDate = document.getElementById('statsEndDate').value;
       
       let filtered = [...expenses];
-      
-      if (startDate) {
-        filtered = filtered.filter(e => e.date >= startDate);
-      }
-      if (endDate) {
-        filtered = filtered.filter(e => e.date <= endDate);
-      }
-      if (catFilter !== "ทั้งหมด") {
-        filtered = filtered.filter(e => e.category === catFilter);
-      }
+      if (startDate) filtered = filtered.filter(e => e.date >= startDate);
+      if (endDate) filtered = filtered.filter(e => e.date <= endDate);
+      if (catFilter !== "ทั้งหมด") filtered = filtered.filter(e => e.category === catFilter);
       
       const statsMap = {};
       let totalFilteredSum = 0;
-      
       filtered.forEach(e => {
         const amt = parseFloat(e.amount) || 0;
         totalFilteredSum += amt;
@@ -954,22 +829,18 @@
       });
       
       document.getElementById('chartCenterSum').innerText = `฿${totalFilteredSum.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-      
       const chartDonut = document.getElementById('chartDonut');
       
       if (totalFilteredSum === 0) {
         chartDonut.style.background = `conic-gradient(#e2e8f0 0% 100%)`;
         document.getElementById('chartLegendContainer').innerHTML = `
-          <div class="bg-slate-50 dark:bg-[#1A1C24] p-8 rounded-2xl text-center text-xs font-bold text-slate-400">
-            ไม่มีข้อมูลค่าใช้จ่ายตามเงื่อนไขที่เลือก
-          </div>`;
+          <div class="bg-slate-50 dark:bg-[#1A1C24] p-8 rounded-2xl text-center text-xs font-bold text-slate-400">ไม่มีข้อมูลค่าใช้จ่ายตามเงื่อนไขที่เลือก</div>`;
         return;
       }
       
       let gradientSegments = [];
       let currentPercent = 0;
       let legendHTML = '';
-      
       const sortedStats = Object.keys(statsMap).sort((a, b) => statsMap[b] - statsMap[a]);
       
       sortedStats.forEach(cat => {
@@ -1011,7 +882,6 @@
       lucide.createIcons();
     }
 
-    // ================= ระบบโมดอลปฏิทินแสดงสถิติหมวดหมู่รายวัน =================
     function toggleCategoryCalendarModal(show) {
       const modal = document.getElementById('categoryCalendarModal');
       modal.classList.toggle('hidden', !show);
@@ -1020,8 +890,6 @@
 
     function openCategoryCalendar(categoryName) {
       calSelectedCategory = categoryName;
-      
-      // ตั้งค่าปีและเดือนปฏิทินปัจจุบันให้เป็น เดือนที่มีข้อมูลล่าสุด หรือ เดือนปัจจุบัน
       const catExpenses = expenses.filter(e => e.category === categoryName);
       if (catExpenses.length > 0) {
         const sorted = catExpenses.sort((a,b) => b.date.localeCompare(a.date));
@@ -1033,10 +901,8 @@
         calCurrentYear = now.getFullYear();
         calCurrentMonth = now.getMonth();
       }
+      calSelectedDayStr = ""; 
       
-      calSelectedDayStr = ""; // ล้างค่าวันทีเลือกเดิมออกก่อน
-      
-      // อัปเดตส่วนหัวของ Modal
       const style = CATEGORY_STYLES[categoryName] || CATEGORY_STYLES["อื่นๆ"];
       const headerIcon = document.getElementById('calHeaderIcon');
       headerIcon.innerText = style.emoji;
@@ -1044,101 +910,61 @@
       headerIcon.style.color = style.hex;
       
       document.getElementById('calHeaderTitle').innerText = `ปฏิทินรายจ่าย: ${categoryName}`;
-      
       renderCalendar();
       toggleCategoryCalendarModal(true);
     }
 
     function changeCalMonth(direction) {
       calCurrentMonth += direction;
-      if (calCurrentMonth < 0) {
-        calCurrentMonth = 11;
-        calCurrentYear--;
-      } else if (calCurrentMonth > 11) {
-        calCurrentMonth = 0;
-        calCurrentYear++;
-      }
+      if (calCurrentMonth < 0) { calCurrentMonth = 11; calCurrentYear--; } 
+      else if (calCurrentMonth > 11) { calCurrentMonth = 0; calCurrentYear++; }
       renderCalendar();
     }
 
     function renderCalendar() {
-      const thaiMonths = [
-        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-      ];
-      
-      // อัปเดตข้อความหัวเดือน/ปีในไทยพุทธศักราช
+      const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
       document.getElementById('calMonthYearText').innerText = `${thaiMonths[calCurrentMonth]} ${calCurrentYear + 543}`;
       
       const gridContainer = document.getElementById('calDaysGrid');
       gridContainer.innerHTML = "";
       
-      // วันแรกของเดือน (0 = วันอาทิตย์)
       const firstDayIndex = new Date(calCurrentYear, calCurrentMonth, 1).getDay();
-      
-      // จำนวนวันทั้งหมดในเดือนนั้น ๆ
       const totalDays = new Date(calCurrentYear, calCurrentMonth + 1, 0).getDate();
       
-      // สร้างช่องว่างก่อนวันแรกของสัปดาห์
       let dayCellsHTML = "";
-      for (let i = 0; i < firstDayIndex; i++) {
-        dayCellsHTML += `<div class="h-8"></div>`;
-      }
+      for (let i = 0; i < firstDayIndex; i++) { dayCellsHTML += `<div class="h-8"></div>`; }
       
-      // สกัดสไตล์และค่าหมวดหมู่
       const style = CATEGORY_STYLES[calSelectedCategory] || CATEGORY_STYLES["อื่นๆ"];
       const colorHex = style.hex || "#10b981";
-      
-      // ดึงประวัติข้อมูลเฉพาะหมวดหมู่ที่เลือกเพื่อระบุวันที่มีการบันทึก
       const catExpenses = expenses.filter(e => e.category === calSelectedCategory);
       
-      // ลูปเขียนปฏิทิน
       for (let day = 1; day <= totalDays; day++) {
         const dayStr = `${calCurrentYear}-${String(calCurrentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        
-        // ตรวจสอบว่าวันนี้มีรายการจ่ายเงินของหมวดนี้หรือไม่
         const hasExpenses = catExpenses.some(e => e.date === dayStr);
         const isSelected = calSelectedDayStr === dayStr;
         
-        let borderStyle = "";
-        let textStyle = "text-slate-700 dark:text-gray-300";
-        let hoverStyle = "hover:bg-slate-100 dark:hover:bg-gray-800/50";
+        let borderStyle = hasExpenses ? "border-2" : "";
+        let textStyle = isSelected ? "text-white font-black" : "text-slate-700 dark:text-gray-300";
+        let hoverStyle = hasExpenses ? "hover:bg-slate-50 dark:hover:bg-[#1c202a]" : "hover:bg-slate-100 dark:hover:bg-gray-800/50";
         
-        if (hasExpenses) {
-          // หากมีข้อมูลรายจ่าย ล้อมรอบด้วยขอบวงกลมหนาตามรหัสสีประจำหมวดหมู่
-          borderStyle = `border-2`;
-          hoverStyle = "hover:bg-slate-50 dark:hover:bg-[#1c202a]";
-        }
-        
-        if (isSelected) {
-          // สีพื้นหลังเต็มวงกลมกรณีเลือกวันนั้น ๆ
-          textStyle = `text-white font-black`;
-        }
-        
-        // สไตล์วงกลมครอบ
         const inlineStyle = `
           border-color: ${hasExpenses ? colorHex : 'transparent'};
           background-color: ${isSelected ? colorHex : 'transparent'};
         `;
         
         dayCellsHTML += `
-          <button onclick="selectCalendarDay('${dayStr}')" 
-                  style="${inlineStyle}" 
-                  class="h-8 w-8 mx-auto rounded-full flex items-center justify-center text-[11px] font-bold ${borderStyle} ${textStyle} ${hoverStyle} transition-all">
+          <button onclick="selectCalendarDay('${dayStr}')" style="${inlineStyle}" class="h-8 w-8 mx-auto rounded-full flex items-center justify-center text-[11px] font-bold ${borderStyle} ${textStyle} ${hoverStyle} transition-all">
             ${day}
           </button>
         `;
       }
-      
       gridContainer.innerHTML = dayCellsHTML;
-      
-      // อัปเดตตารางสรุปรายการด้านล่าง
       updateCalendarDetailsSection();
     }
 
     function selectCalendarDay(dayStr) {
       calSelectedDayStr = dayStr;
-      renderCalendar(); // เพื่อวาดไฮไลต์การเลือกสีใหม่
+      renderCalendar(); 
     }
 
     function updateCalendarDetailsSection() {
@@ -1150,51 +976,37 @@
         badge.className = "text-[10px] font-black text-slate-400";
         listContainer.innerHTML = `
           <div class="text-center py-6 text-xs font-bold text-slate-400 flex flex-col items-center gap-1">
-            <i data-lucide="info" class="w-4 h-4 text-slate-300"></i>
-            คลิกวันที่วงกลมสีบนปฏิทินเพื่อดูบันทึก
+            <i data-lucide="info" class="w-4 h-4 text-slate-300"></i>คลิกวันที่วงกลมสีบนปฏิทินเพื่อดูบันทึก
           </div>`;
         lucide.createIcons();
         return;
       }
       
-      // อัปเดตหัววันที่ไทย
       badge.innerText = formatDateThai(calSelectedDayStr);
       badge.className = "text-[10px] font-black text-purple-500";
-      
-      // กรองรายการของหมวดหมู่และวันทีเลือก
       const dayExpenses = expenses.filter(e => e.category === calSelectedCategory && e.date === calSelectedDayStr);
       
       if (dayExpenses.length === 0) {
-        listContainer.innerHTML = `
-          <div class="text-center py-6 text-xs font-bold text-slate-400">
-            ไม่มีรายการบันทึกของหมวดหมู่นี้ในวันนี้
-          </div>`;
+        listContainer.innerHTML = `<div class="text-center py-6 text-xs font-bold text-slate-400">ไม่มีรายการบันทึกของหมวดหมู่นี้ในวันนี้</div>`;
         return;
       }
       
-      // วาดแถวรายละเอียดข้อมูล
       listContainer.innerHTML = dayExpenses.map(e => {
         const amt = parseFloat(e.amount) || 0;
         return `
           <div class="bg-slate-50 dark:bg-gray-800/40 border border-slate-100 dark:border-gray-800 p-2.5 rounded-xl flex items-center justify-between text-xs transition-all">
-            <div class="min-w-0 pr-2">
-              <p class="font-black text-slate-800 dark:text-gray-100 truncate">${e.description}</p>
-            </div>
-            <span class="font-black text-rose-500 dark:text-rose-400 flex-shrink-0">
-              ฿${amt.toLocaleString('th-TH', {minimumFractionDigits:2})}
-            </span>
+            <div class="min-w-0 pr-2"><p class="font-black text-slate-800 dark:text-gray-100 truncate">${e.description}</p></div>
+            <span class="font-black text-rose-500 dark:text-rose-400 flex-shrink-0">฿${amt.toLocaleString('th-TH', {minimumFractionDigits:2})}</span>
           </div>
         `;
       }).join('');
     }
 
-    // ================= ระบบสลับแท็บเมนูการใช้งาน =================
     function switchTab(tab) {
       const tabs = ['add', 'history', 'stats'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         const content = document.getElementById(`content-${t}`);
-        
         if (t === tab) {
           btn.className = "flex-1 py-3 text-[11px] font-black rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-[#1A1C24] text-slate-800 dark:text-white shadow-sm";
           content.classList.remove('hidden');
@@ -1203,25 +1015,19 @@
           content.classList.add('hidden');
         }
       });
-
       if(tab === 'history') renderHistoryView();
       if(tab === 'stats') renderStatsView();
     }
 
-    //  แปลงรูปแบบวันที่ปกติเป็นรูปแบบไทย
     function formatDateThai(dateStr) {
       if (!dateStr) return "";
       const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
       const p = dateStr.split('-');
       if (p.length !== 3) return dateStr;
-      
-      const day = parseInt(p[2]);
-      const month = months[parseInt(p[1]) - 1];
-      const year = parseInt(p[0]) + 543;
-      return `${day} ${month} ${year}`;
+      return `${parseInt(p[2])} ${months[parseInt(p[1]) - 1]} ${parseInt(p[0]) + 543}`;
     }
 
-    // ================= ระบบส่งฟอร์ม CRUD และจัดเก็บข้อมูล =================
+    // ================= [แก้ไขหลักที่นี่] ระบบส่งฟอร์มบันทึกข้อมูลลง Google Sheet และแอปพลิเคชัน =================
     function handleFormSubmit(e) {
       e.preventDefault();
       
@@ -1236,65 +1042,92 @@
       }
       
       if(editingId) {
-        // โหมดอัปเดตแก้ไขรายการเดิม
+        // 1. โหมดแก้ไขข้อมูลเดิม
         const targetIndex = expenses.findIndex(ex => ex.id === editingId);
         if(targetIndex !== -1) {
           expenses[targetIndex] = { ...expenses[targetIndex], date, category, description, amount };
         }
         
+        // เรนเดอร์บนหน้าจอก่อนทันทีเพื่อให้แอปตอบสนองไว ไม่ต้องรอคอยเน็ต
+        renderDataAndStats();
+        
         if(isCloudMode) {
           showToast("กำลังอัปเดตข้อมูลบนคลาวด์...", "loader");
-          fetch(`${webAppUrl}?action=updateExpense`, {
+          
+          // แก้ไขการจัดรูปแบบส่งหา Apps Script ให้ถูกต้องตามฟังก์ชัน doPost(e)
+          const payload = {
+            action: "updateExpense",
+            data: { id: editingId, date, category, description, amount }
+          };
+
+          fetch(webAppUrl, {
             method: 'POST',
             mode: 'cors',
             redirect: 'follow',
-            body: JSON.stringify({ id: editingId, date, category, description, amount })
+            body: JSON.stringify(payload)
           })
           .then(res => res.json())
-          .then(() => {
-            fetchExpensesFromCloud();
-            cancelEditMode();
+          .then(resData => {
+            if(resData.status === 'success') {
+              showToast("อัปเดตข้อมูลลงชีทเรียบร้อย", "check-circle");
+              // โหลดดึงยอดทั้งหมดรอบล่าสุดมา Re-check
+              fetchExpensesFromCloud();
+            } else {
+              throw new Error(resData.message);
+            }
           })
           .catch(err => {
             console.error(err);
-            showToast("แก้ไขบนคลาวด์ไม่สำเร็จ", "alert-triangle");
+            showToast("แก้ไขบนคลาวด์ล้มเหลว", "alert-triangle");
           });
         } else {
           localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
-          renderDataAndStats();
-          cancelEditMode();
-          showToast("แก้ไขข้อมูลสำเร็จ", "check");
+          showToast("แก้ไขข้อมูลสำเร็จ (Local)", "check");
         }
+        cancelEditMode();
         
       } else {
-        // โหมดการสร้างข้อมูลบันทึกใหม่
+        // 2. โหมดกดบันทึกรายการเบิกจ่ายใหม่
         const newId = Date.now().toString();
         const newExpense = { id: newId, date, category, description, amount };
         
+        // เอาเข้าคิวบนหน้าแอปเพื่อให้ผู้ใช้เห็นทันที
         expenses.unshift(newExpense);
+        renderDataAndStats();
+        resetFormInputs();
         
         if(isCloudMode) {
-          showToast("กำลังอัปโหลดขึ้นคลาวด์...", "loader");
-          fetch(`${webAppUrl}?action=addExpense`, {
+          showToast("กำลังบันทึกลงคลาวด์ชีท...", "loader");
+          
+          // แก้ไขการจัดโครงสร้าง Payload คีย์ข้อมูลให้ตรงตาม API ของ Google Sheets 
+          const payload = {
+            action: "addExpense",
+            data: { date, category, description, amount }
+          };
+
+          fetch(webAppUrl, {
             method: 'POST',
             mode: 'cors',
             redirect: 'follow',
-            body: JSON.stringify(newExpense)
+            body: JSON.stringify(payload)
           })
           .then(res => res.json())
-          .then(() => {
-            fetchExpensesFromCloud();
-            resetFormInputs();
+          .then(resData => {
+            if(resData.status === 'success') {
+              showToast("บันทึกข้อมูลลง Google Sheet สำเร็จ!", "check-circle");
+              // ซิงก์ดึงข้อมูลอัปเดตล่าสุดมาล้างความถูกต้องของ ID อีกครั้ง
+              fetchExpensesFromCloud();
+            } else {
+              throw new Error(resData.message);
+            }
           })
           .catch(err => {
             console.error(err);
-            showToast("ส่งขึ้นคลาวด์ล้มเหลว", "alert-triangle");
+            showToast("ส่งข้อมูลลงชีทล้มเหลว", "alert-triangle");
           });
         } else {
           localStorage.setItem(DEMO_KEY, JSON.stringify(expenses));
-          renderDataAndStats();
-          resetFormInputs();
-          showToast("บันทึกข้อมูลเรียบร้อย", "check");
+          showToast("บันทึกข้อมูลเรียบร้อย (Local)", "check");
         }
       }
     }
@@ -1378,7 +1211,6 @@
       }
     }
 
-    // ================= ระบบแสดง Toast แจ้งเตือน =================
     function showToast(message, iconName = "info") {
       const container = document.getElementById('toastContainer');
       if(!container) return;
@@ -1390,10 +1222,7 @@
       container.appendChild(toast);
       lucide.createIcons({ attrs: { class: "w-4 h-4 flex-shrink-0" } });
       
-      setTimeout(() => {
-        toast.classList.remove('translate-y-4', 'opacity-0', 'scale-95');
-      }, 50);
-      
+      setTimeout(() => { toast.classList.remove('translate-y-4', 'opacity-0', 'scale-95'); }, 50);
       setTimeout(() => {
         toast.classList.add('translate-y-2', 'opacity-0', 'scale-95');
         setTimeout(() => toast.remove(), 300);
